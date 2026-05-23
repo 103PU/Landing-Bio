@@ -1205,3 +1205,55 @@ body.loaded .bg-video {
         font-size: 3.5rem;
     }
 }
+
+/* VALORANT TOOLS specific styles */
+.title-val-tools {
+    color: #a855f7; /* Purple base */
+}
+
+.title-val-tools .line {
+    background: linear-gradient(90deg, #a855f7, transparent);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.title-val-tools span {
+    animation: purple-neon-pulse 2s infinite alternate;
+}
+
+@keyframes purple-neon-pulse {
+    0% {
+        text-shadow: 0 0 5px #a855f7, 0 0 10px #a855f7;
+        opacity: 0.8;
+    }
+    100% {
+        text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 30px #a855f7;
+        opacity: 1;
+        transform: scale(1.02);
+    }
+}
+
+.card--val-tweaks {
+    --card-color: #ff4655;
+}
+
+.card--val-tweaks .rotate-layer {
+    animation-duration: 4.5s;
+}
+
+.card--val-tweaks svg {
+    color: var(--color-val, #ff4655);
+    filter: drop-shadow(0 0 10px rgba(255, 70, 85, 0.8));
+}
+
+.card--license {
+    --card-color: #00ff87;
+}
+
+.card--license .rotate-layer {
+    animation-duration: 6s;
+}
+
+.card--license i {
+    color: #00ff87;
+    text-shadow: 0 0 15px rgba(0, 255, 135, 0.8);
+}
