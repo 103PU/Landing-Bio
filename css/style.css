@@ -385,6 +385,7 @@ img { max-width: 100%; display: block; }
 .work-cover--license { background: linear-gradient(135deg, #3d2bb5 0%, #7c5cff 60%, #a78bfa 100%); }
 .work-cover--valt    { background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 40%, #ff4655 100%); }
 .work-cover--portfolio { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #6366f1 100%); }
+.work-cover--aao { background: linear-gradient(135deg, #0a2540 0%, #0ea5e9 56%, #38bdf8 100%); }
 
 /* ── Cover inner layout ── */
 .work-cover-inner {
@@ -455,6 +456,33 @@ img { max-width: 100%; display: block; }
 .wc-hero-blob { width: 44px; height: 44px; border-radius: 50%; background: rgba(99,102,241,0.5); flex-shrink: 0; }
 .wc-web-nav { display: flex; gap: 8px; padding: 0 10px 10px; justify-content: flex-end; }
 .wc-nl { height: 7px; width: 28px; border-radius: 3px; background: rgba(255,255,255,0.15); }
+
+.wc-mockup--chat {
+    width: 72%;
+    max-width: 260px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.26);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.wc-chat-header { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-3); background: rgba(10,37,64,0.52); }
+.wc-ai-avatar { width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #38bdf8 55%, #0ea5e9); }
+.wc-chat-meta { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.wc-chat-title, .wc-chat-status { display: block; height: 6px; border-radius: var(--r-pill); background: rgba(255,255,255,0.72); }
+.wc-chat-title { width: 54%; }
+.wc-chat-status { width: 34%; opacity: 0.42; }
+.wc-chat-body { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4); }
+.wc-bubble-row { display: flex; }
+.wc-bubble-row.user { justify-content: flex-end; }
+.wc-bubble-row.ai { justify-content: flex-start; }
+.wc-bubble { display: block; width: 58%; height: 15px; border-radius: var(--r-pill); background: rgba(255,255,255,0.82); }
+.wc-bubble-row.user .wc-bubble { background: rgba(124,92,255,0.82); }
+.wc-bubble.short { width: 42%; }
+.wc-bubble.wide { width: 68%; }
+.wc-chat-input { display: flex; align-items: center; gap: var(--s-2); padding: var(--s-3); border-top: 1px solid rgba(255,255,255,0.18); }
+.wc-input-bar { height: 12px; flex: 1; border-radius: var(--r-pill); background: rgba(255,255,255,0.28); }
+.wc-send-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); }
 
 .work-meta { padding: var(--s-6); display: flex; flex-direction: column; gap: var(--s-2); flex: 1; }
 .work-tags { display: flex; gap: var(--s-2); flex-wrap: wrap; }

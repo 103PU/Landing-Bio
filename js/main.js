@@ -8,7 +8,7 @@
     const burger = document.getElementById('navBurger');
     const mobileMenu = document.getElementById('mobileMenu');
     const themeToggle = document.getElementById('themeToggle');
-    const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+    const navLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
 
     // --- 1. Navbar frosted-glass on scroll ---
     const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 24);
@@ -79,9 +79,15 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const d = new FormData(form);
-            const subject = encodeURIComponent(`[${d.get('type')}] from ${d.get('name')}`);
-            const body = encodeURIComponent(`${d.get('message')}\n\n— ${d.get('name')} (${d.get('email')})`);
-            window.location.href = `mailto:hello@103pu.dev?subject=${subject}&body=${body}`;
+            const subject = encodeURIComponent(`[Portfolio Contact] ${d.get('type')} — ${d.get('name')}`);
+            const body = encodeURIComponent(
+                `Xin chào Dũng,\n\n${d.get('message')}\n\n` +
+                `────────────────\n` +
+                `Từ: ${d.get('name')}\n` +
+                `Email: ${d.get('email')}\n` +
+                `Loại: ${d.get('type')}`
+            );
+            window.location.href = `mailto:dungbd2005@gmail.com?subject=${subject}&body=${body}`;
         });
     }
 
@@ -89,3 +95,4 @@
     const year = document.getElementById('year');
     if (year) year.textContent = new Date().getFullYear();
 })();
+
