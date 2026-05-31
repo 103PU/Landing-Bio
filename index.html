@@ -1,279 +1,379 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>103_PU | Gaming Creator</title>
-    
+    <title>103_PU — UI/UX Designer & Frontend Developer</title>
+    <meta name="description" content="Portfolio of 103_PU — UI/UX Designer & Frontend Developer crafting beautiful, accessible interfaces backed by real engineering.">
+
     <link rel="stylesheet" href="./css/style.css">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 </head>
+<body>
 
-<video id="bg-video-player" class="bg-video" autoplay muted loop playsinline>
-        <source src="/assets/Jumping Machine (跳楼机).mp3" type="music/mp3"></video>
-    </video>    
-<body class="is-loading">
+    <!-- ===================== NAVBAR ===================== -->
+    <header class="navbar" id="navbar">
+        <div class="nav-inner">
+            <a href="#hero" class="nav-logo" data-scroll>103_PU<span class="dot">.</span></a>
 
-    <div id="cinematic-intro">
-        <div class="intro-bg"></div> 
-        <div class="intro-content">
-            <div class="intro-line line-1">WELCOME TO MY UNIVERSE</div>
-            <div class="intro-line line-2">103_PU</div>
+            <nav class="nav-links" id="navLinks" aria-label="Primary">
+                <a href="#work" data-scroll>Work</a>
+                <a href="#about" data-scroll>About</a>
+                <a href="#skills" data-scroll>Skills</a>
+                <a href="#process" data-scroll>Process</a>
+                <a href="#contact" data-scroll>Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle color theme">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <a href="#contact" class="btn btn-primary nav-cta" data-scroll>Hire me <span aria-hidden="true">→</span></a>
+                <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </div>
+    </header>
+
+    <!-- ===================== MOBILE OVERLAY ===================== -->
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <nav class="mobile-menu-links">
+            <a href="#work" data-scroll>Work</a>
+            <a href="#about" data-scroll>About</a>
+            <a href="#skills" data-scroll>Skills</a>
+            <a href="#process" data-scroll>Process</a>
+            <a href="#contact" data-scroll>Contact</a>
+            <a href="#contact" class="btn btn-primary" data-scroll>Hire me →</a>
+        </nav>
     </div>
 
-    <div class="bg-overlay"></div>
-    <div class="bg-text-effect">103_PU</div>
-    <div class="bg-particles"></div>
-    <div class="bg-gradient"></div>
-
-    <main class="main-wrapper">
-        <div class="bento-grid">
-
-            <div class="card card--profile js-tilt">
-                <div class="shimmer-layer"></div>
-                <div class="card__content">
-                    <div class="profile-img-box">
-                        <img src="./assets/avatar.jpg" onerror="this.src='https://images.unsplash.com/photo-1620247407367-b364392d2906?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'" alt="103_PU" class="profile-img">
-                        <div class="status-indicator"></div>
+    <main>
+        <!-- ===================== 01 / HERO ===================== -->
+        <section class="hero section" id="hero">
+            <div class="hero-grid">
+                <div class="hero-text">
+                    <span class="badge reveal"><span class="status-dot"></span>Available for work</span>
+                    <h1 class="hero-title reveal">Hey, I'm <span class="accent">103_PU</span> — I design interfaces that <span class="accent">feel right</span>.</h1>
+                    <p class="hero-sub reveal">UI/UX Designer &amp; Frontend Developer bridging beautiful interfaces with real engineering constraints.</p>
+                    <div class="hero-cta reveal">
+                        <a href="#work" class="btn btn-primary" data-scroll>View my work <span aria-hidden="true">↓</span></a>
+                        <a href="./assets/avatar.jpg" download class="btn btn-ghost">Download CV</a>
                     </div>
-                    <div class="profile-info">
-                        <h1 class="glitch-text" data-text="103_PU">103_PU</h1>
-                        <p class="profile-tag">Gaming Creator & Streamer</p>
+                    <div class="hero-socials reveal" aria-label="Social links">
+                        <a href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub" class="social-link">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 5 18 5.3 18 5.3c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>
+                        </a>
+                        <a href="https://dribbble.com/" target="_blank" rel="noopener" aria-label="Dribbble" class="social-link">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm7.9 5.5a10.1 10.1 0 0 1 2.3 6.3c-.3-.1-3.6-.7-6.9-.3-.1-.2-.1-.3-.2-.5-.2-.5-.5-1-.7-1.5 3.6-1.5 5.2-3.6 5.5-4zm-1.4-1.2c-.3.4-1.8 2.4-5.2 3.7A53 53 0 0 0 9.5 2.3a10.1 10.1 0 0 1 9 2zM7.7 3a64 64 0 0 1 3.7 5.6A36 36 0 0 1 2.6 9.7 10.1 10.1 0 0 1 7.7 3zM1.9 12v-.3c.3 0 5.2.1 9.9-1.3.3.5.5 1 .8 1.6l-.4.1c-4.9 1.6-7.4 5.9-7.6 6.3A10 10 0 0 1 1.9 12zm10.1 10a10 10 0 0 1-6.2-2.1c.2-.3 1.9-3.7 7.3-5.6 2.2 5.8 3.1 10.6 3.4 12a10 10 0 0 1-4.5.7zm6.3-1.7c-.2-1.1-1-5.6-3.1-11.3 3.1-.5 5.8.3 6.2.4a10 10 0 0 1-3.1 10.9z"/></svg>
+                        </a>
+                        <a href="https://linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" class="social-link">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.4h-3.6v-5.6c0-1.3 0-3-1.9-3s-2.1 1.4-2.1 2.9v5.7H9.2V9h3.4v1.6h.1c.5-.9 1.7-1.9 3.4-1.9 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zm1.8 13H3.5V9h3.6v11.4zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>
+                        </a>
+                        <a href="mailto:hello@103pu.dev" aria-label="Email" class="social-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <!-- ============================================== -->
-            <!-- SECTION: VALORANT TOOLS -->
-            <!-- ============================================== -->
-            <div class="section-title title-tools title-val-tools">
-                <span>/// VALORANT TOOLS</span>
-                <div class="line"></div>
-            </div>
-
-            <!-- Card 1: VALORANT TWEAKS -->
-            <a href="#" onclick="showDiscordModal(event)" class="card card--square card--val-tweaks js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-pulse">
-                        <img src="data:image/png;base64,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" alt="Valorant Tweaks Icon" style="width: 50px; height: 50px; filter: drop-shadow(0 0 10px rgba(255, 70, 85, 0.8));">
-                    </div>
-                    <h3 class="card-title">TWEAKS</h3>
-                    <p class="card-sub">Optimize App</p>
+                <div class="hero-visual reveal">
+                    <div class="hero-blob"></div>
+                    <img src="./assets/avatar.jpg" alt="Portrait of 103_PU" class="hero-avatar">
+                    <div class="hero-float-card hero-float-1">Figma → Code</div>
+                    <div class="hero-float-card hero-float-2"><span class="status-dot"></span>WCAG ready</div>
                 </div>
-            </a>
-
-            <!-- Card 2: LICENSE PAGE -->
-            <a href="https://keylicensedashboard.dungbd2005.workers.dev/" target="_blank" class="card card--square card--license js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-float">
-                        <i class="fa-solid fa-key"></i>
-                    </div>
-                    <h3 class="card-title">LICENSE</h3>
-                    <p class="card-sub">103_PU Keys</p>
-                </div>
-            </a>
-
-            <div class="section-title title-social">
-                <span>/// SOCIAL MEDIA</span>
-                <div class="line"></div>
             </div>
+        </section>
 
-            <a href="https://www.tiktok.com/@103_pu_" target="_blank" class="card card--tiktok js-tilt">
-                <div class="animated-border"></div>
-                <div class="card__bg-icon"><i class="fa-brands fa-tiktok"></i></div>
-                <div class="card__content">
-                    <div class="card__header">
-                        <i class="fa-brands fa-tiktok card__icon"></i>
-                        <span class="card__badge">Main Channel</span>
-                    </div>
-                    <div class="card__body tiktok-body-layout">
-                        <div class="tiktok-text-group">
-                            <h3>TikTok Channel</h3>
-                            <p>Highlights & Funny Moments</p>
-                        </div>
-                        <div class="tiktok-channel-img">
-                            <img src="./assets/avatar.jpg" onerror="this.src='https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/6b019e6b8d5c478b318b823587458e5d~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=f8f77826&x-expires=1765220400&x-signature=%2FX%2FqxOSJEw1hiEwjFHn5iFemMJc%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my3'" alt="TikTok Logo">
+        <!-- ===================== 02 / WORK ===================== -->
+        <section class="section" id="work">
+            <header class="section-head reveal">
+                <span class="label">Selected Work</span>
+                <h2 class="section-title">Projects I'm proud of</h2>
+            </header>
+
+            <div class="work-grid">
+
+                <!-- PROJECT 1 — Key License Dashboard (feature, full-width row 1) -->
+                <a href="https://keylicensedashboard.dungbd2005.workers.dev/" target="_blank" rel="noopener" class="work-card work-card--feature reveal">
+                    <div class="work-cover work-cover--license">
+                        <div class="work-cover-inner">
+                            <div class="wc-mockup wc-mockup--dashboard">
+                                <div class="wc-topbar"><span class="wc-dot r"></span><span class="wc-dot y"></span><span class="wc-dot g"></span><span class="wc-url">keylicensedashboard.workers.dev</span></div>
+                                <div class="wc-body">
+                                    <div class="wc-sidebar"><div class="wc-si"></div><div class="wc-si"></div><div class="wc-si active"></div><div class="wc-si"></div></div>
+                                    <div class="wc-content">
+                                        <div class="wc-stat-row"><div class="wc-stat"></div><div class="wc-stat"></div><div class="wc-stat"></div></div>
+                                        <div class="wc-table"><div class="wc-tr head"></div><div class="wc-tr"></div><div class="wc-tr"></div><div class="wc-tr"></div></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card__arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
-                </div>
-            </a>
-
-            <a href="https://www.youtube.com/@103_PU-tiktoker?sub_confirmation=1" target="_blank" class="card card--square card--youtube-neon js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-pulse">
-                        <i class="fa-brands fa-youtube"></i>
+                    <div class="work-meta">
+                        <div class="work-tags">
+                            <span class="tag">Web App</span>
+                            <span class="tag">Admin Dashboard</span>
+                            <span class="tag">Design System</span>
+                        </div>
+                        <h3>Key License Dashboard</h3>
+                        <p>Full-stack admin portal for software license management — auth, key issuance, device tracking, risk detection and usage analytics. Built on Cloudflare edge with a custom design system.</p>
+                        <div class="work-tools">
+                            <span class="badge-sm">Cloudflare Workers</span>
+                            <span class="badge-sm">D1 Database</span>
+                            <span class="badge-sm">JavaScript</span>
+                            <span class="badge-sm">Figma</span>
+                        </div>
                     </div>
-                    <h3 class="card-title">YouTube</h3>
-                    <p class="card-sub">Subscribe For Me</p>
-                </div>
-            </a>
+                    <span class="work-overlay">View live project →</span>
+                </a>
 
-            <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" class="card card--square card--discord js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-float">
-                        <i class="fa-brands fa-discord"></i>
+                <!-- PROJECT 2 — Valorant Tweaks (feature, full-width row 2) -->
+                <a href="#" class="work-card work-card--feature reveal">
+                    <div class="work-cover work-cover--valt">
+                        <div class="work-cover-inner">
+                            <div class="wc-mockup wc-mockup--app">
+                                <div class="wc-app-chrome">
+                                    <div class="wc-titlebar"><span class="wc-appname">Valorant Tweaks</span><div class="wc-winbtn-row"><span class="wc-winbtn"></span><span class="wc-winbtn"></span><span class="wc-winbtn red"></span></div></div>
+                                    <div class="wc-app-body">
+                                        <div class="wc-app-nav"><div class="wc-ni active"></div><div class="wc-ni"></div><div class="wc-ni"></div><div class="wc-ni"></div></div>
+                                        <div class="wc-app-main">
+                                            <div class="wc-toggle-row"><div class="wc-toggle-label"></div><div class="wc-toggle on"></div></div>
+                                            <div class="wc-toggle-row"><div class="wc-toggle-label"></div><div class="wc-toggle on"></div></div>
+                                            <div class="wc-toggle-row"><div class="wc-toggle-label"></div><div class="wc-toggle"></div></div>
+                                            <div class="wc-toggle-row"><div class="wc-toggle-label"></div><div class="wc-toggle on"></div></div>
+                                            <div class="wc-btn-row"><div class="wc-bigbtn">Apply Tweaks</div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="card-title">Discord</h3>
-                    <p class="card-sub">Join My Server</p>
-                    <div class="online-dot"></div>
-                </div>
-            </a>
+                    <div class="work-meta">
+                        <div class="work-tags">
+                            <span class="tag">Desktop App</span>
+                            <span class="tag">WPF / .NET</span>
+                            <span class="tag">System Tool</span>
+                        </div>
+                        <h3>Valorant Tweaks</h3>
+                        <p>A Windows desktop performance tool for Valorant players — system optimizer, debloat, DNS switcher, GPU tweaks and account manager. Designed with a Riot-inspired visual language and licensed via Key License Dashboard.</p>
+                        <div class="work-tools">
+                            <span class="badge-sm">C# / .NET</span>
+                            <span class="badge-sm">WPF / MAUI</span>
+                            <span class="badge-sm">Figma</span>
+                            <span class="badge-sm">PowerShell</span>
+                        </div>
+                    </div>
+                    <span class="work-overlay">View case study →</span>
+                </a>
 
-            <div class="section-title title-game">
-                <span>[ GAME ZONE ]</span>
-                <div class="line"></div>
+                <!-- PROJECT 3 — Portfolio (small card) -->
+                <a href="#hero" data-scroll class="work-card reveal">
+                    <div class="work-cover work-cover--portfolio">
+                        <div class="work-cover-inner">
+                            <div class="wc-mockup wc-mockup--web">
+                                <div class="wc-topbar small"><span class="wc-dot r"></span><span class="wc-dot y"></span><span class="wc-dot g"></span><span class="wc-url">103pu.dev</span></div>
+                                <div class="wc-web-hero">
+                                    <div class="wc-hero-text"><div class="wc-line w70"></div><div class="wc-line w50"></div></div>
+                                    <div class="wc-hero-blob"></div>
+                                </div>
+                                <div class="wc-web-nav"><div class="wc-nl"></div><div class="wc-nl"></div><div class="wc-nl"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="work-meta">
+                        <div class="work-tags">
+                            <span class="tag">Portfolio</span>
+                            <span class="tag">Landing Page</span>
+                        </div>
+                        <h3>This Portfolio</h3>
+                        <p>Designed and built from scratch — semantic HTML, full CSS token system, dark/light theme, scroll-reveal animations and zero dependencies.</p>
+                        <div class="work-tools">
+                            <span class="badge-sm">HTML / CSS</span>
+                            <span class="badge-sm">Vanilla JS</span>
+                            <span class="badge-sm">Figma</span>
+                        </div>
+                    </div>
+                    <span class="work-overlay">You're looking at it →</span>
+                </a>
+
             </div>
+        </section>
 
-            <a href="https://valorant.vnggames.com/vi-vn/top-1-fps-phong-may/" target="_blank" class="card card--wide card--valorant js-tilt">
-                <div class="card__bg-glow-val"></div>
-                <div class="card__content row-content">
-                    <div class="valorant-logo-box">
-                        <svg class="val-svg" viewBox="0 0 100 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M99.25 0H67.5L50 35.13 32.5 0H0.75L50 100L99.25 0Z"/>
-                        </svg>
-                    </div>
-                    <div class="text-box">
-                        <h3 style="font-family: 'Space Mono'">VALORANT</h3>
-                        <p>VNG Games</p>
-                    </div>
-                    <div class="action-box val-arrow"><i class="fa-solid fa-crosshairs"></i></div>
+        <!-- ===================== 03 / ABOUT ===================== -->
+        <section class="section" id="about">
+            <div class="about-grid">
+                <div class="about-visual reveal">
+                    <div class="hero-blob about-blob"></div>
+                    <img src="./assets/avatar.jpg" alt="103_PU at work" class="about-img">
                 </div>
-            </a>
-
-            <a href="https://www.roblox.com/Login" target="_blank" class="card card--square card--roblox js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-bounce-block">
-                        <svg width="50" height="50" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.7 3.5L23.1 7.7L18.9 23.1L3.5 18.9L7.7 3.5Z M11.6 10.1L10.1 15.7L15.7 17.2L17.2 11.6L11.6 10.1Z"/>
-                        </svg>
+                <div class="about-text reveal">
+                    <span class="label">About me</span>
+                    <h2 class="section-title">Design that respects both users and engineers</h2>
+                    <p>I'm a UI/UX designer who also writes the frontend. That dual lens means I design with the grain of the platform — interfaces that look intentional, ship on time, and stay accessible.</p>
+                    <p>I care about systems over screens: tokens, components and patterns that scale instead of one-off pixels.</p>
+                    <div class="stats-row">
+                        <div class="stat"><strong>20+</strong><span>Projects shipped</span></div>
+                        <div class="stat"><strong>5</strong><span>Years experience</span></div>
+                        <div class="stat"><strong>12+</strong><span>Happy clients</span></div>
                     </div>
-                    <h3 class="card-title">Roblox</h3>
-                    <p class="card-sub">Time For Creations</p>
+                    <a href="#contact" class="btn btn-ghost" data-scroll>Read full story</a>
                 </div>
-            </a>
-
-            <a href="https://zingspeedm.vnggames.com/" target="_blank" class="card card--square card--zingspeed js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="speed-lines"></div>
-                <div class="card__content center-content" style="z-index: 3;">
-                    <div class="icon-wrapper icon-drift">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdoKRHfiAxxTdbezi1vQkG7ucNCkU7nmwQFw&s" alt="ZingSpeed Mobile" class="game-logo-img">
-                    </div>
-                    <h3 class="card-title">ZingSpeed</h3>
-                    <p class="card-sub">Let's Drift Together</p>
-                </div>
-            </a>
-
-            <div class="section-title title-others">
-                <span>:: OTHERS ::</span>
-                <div class="line"></div>
             </div>
+        </section>
 
-            <a href="https://beacons.ai/103_pu/" target="_blank" class="card card--wide card--beacons js-tilt">
-                <div class="card__content row-content">
-                    <div class="icon-box-small">
-                        <img src="https://beacons.ai/favicon.ico" onerror="this.src='data:image/svg+xml;base64,...'" alt="Beacons" class="other-logo-img">
+        <!-- ===================== 04 / SKILLS ===================== -->
+        <section class="section" id="skills">
+            <header class="section-head reveal">
+                <span class="label">Skills</span>
+                <h2 class="section-title">Tools I reach for</h2>
+            </header>
+            <div class="skills-grid">
+                <article class="skill-card reveal">
+                    <div class="skill-head">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                        <h3>Design</h3>
                     </div>
-                    <div class="text-box">
-                        <h3>More Links</h3>
-                        <p>Beacons Bio</p>
+                    <ul class="skill-list">
+                        <li>Figma <span class="prof prof-expert">Expert</span></li>
+                        <li>Design Systems <span class="prof prof-expert">Expert</span></li>
+                        <li>Prototyping <span class="prof prof-proficient">Proficient</span></li>
+                        <li>User Research <span class="prof prof-proficient">Proficient</span></li>
+                        <li>Wireframing <span class="prof prof-expert">Expert</span></li>
+                        <li>Illustrator <span class="prof prof-familiar">Familiar</span></li>
+                    </ul>
+                </article>
+                <article class="skill-card reveal">
+                    <div class="skill-head">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <h3>Frontend</h3>
                     </div>
-                    <div class="action-box"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                    <ul class="skill-list">
+                        <li>HTML / CSS <span class="prof prof-expert">Expert</span></li>
+                        <li>React <span class="prof prof-proficient">Proficient</span></li>
+                        <li>TypeScript <span class="prof prof-proficient">Proficient</span></li>
+                        <li>Tailwind <span class="prof prof-expert">Expert</span></li>
+                        <li>Animation <span class="prof prof-proficient">Proficient</span></li>
+                        <li>Responsive Design <span class="prof prof-expert">Expert</span></li>
+                    </ul>
+                </article>
+                <article class="skill-card reveal">
+                    <div class="skill-head">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        <h3>Tools &amp; Process</h3>
+                    </div>
+                    <ul class="skill-list">
+                        <li>Git <span class="prof prof-expert">Expert</span></li>
+                        <li>Jira / Notion <span class="prof prof-proficient">Proficient</span></li>
+                        <li>Agile / Scrum <span class="prof prof-proficient">Proficient</span></li>
+                        <li>A/B Testing <span class="prof prof-familiar">Familiar</span></li>
+                        <li>Accessibility (WCAG) <span class="prof prof-proficient">Proficient</span></li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <!-- ===================== 05 / PROCESS ===================== -->
+        <section class="section" id="process">
+            <header class="section-head reveal">
+                <span class="label">How I work</span>
+                <h2 class="section-title">A simple, repeatable process</h2>
+            </header>
+            <div class="process-grid">
+                <article class="process-step reveal">
+                    <span class="step-num">01</span>
+                    <h3>Discover</h3>
+                    <p>Research, stakeholder interviews and a UX audit to understand the real problem before touching pixels.</p>
+                </article>
+                <article class="process-step reveal">
+                    <span class="step-num">02</span>
+                    <h3>Define</h3>
+                    <p>Frame the problem, map the user journey and agree on priorities so we build the right thing.</p>
+                </article>
+                <article class="process-step reveal">
+                    <span class="step-num">03</span>
+                    <h3>Design</h3>
+                    <p>Wireframe, prototype and iterate fast against real feedback — from low fidelity to polished.</p>
+                </article>
+                <article class="process-step reveal">
+                    <span class="step-num">04</span>
+                    <h3>Deliver</h3>
+                    <p>Clean handoff, dev collaboration, QA and a confident launch — then measure and refine.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ===================== 06 / TESTIMONIALS ===================== -->
+        <section class="section section-alt" id="testimonials">
+            <header class="section-head reveal">
+                <span class="label">Kind words</span>
+                <h2 class="section-title">What people say</h2>
+            </header>
+            <div class="testi-grid">
+                <figure class="testi-card reveal">
+                    <blockquote>"103_PU turned a messy idea into a product our users actually understand. The handoff was the cleanest I've seen."</blockquote>
+                    <figcaption><span class="testi-avatar">M</span><span><strong>Minh Tran</strong><small>Product Lead, Nimbus</small></span></figcaption>
+                </figure>
+                <figure class="testi-card reveal">
+                    <blockquote>"Rare to find someone who designs and ships. Fewer back-and-forths, faster releases, better UI."</blockquote>
+                    <figcaption><span class="testi-avatar">A</span><span><strong>Anh Le</strong><small>Engineering Manager, Vela</small></span></figcaption>
+                </figure>
+                <figure class="testi-card reveal">
+                    <blockquote>"Thoughtful, systematic and genuinely cares about accessibility. Our design system finally feels coherent."</blockquote>
+                    <figcaption><span class="testi-avatar">S</span><span><strong>Sara Pham</strong><small>Founder, Drift Studio</small></span></figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- ===================== 07 / CONTACT ===================== -->
+        <section class="section" id="contact">
+            <div class="contact-grid">
+                <div class="contact-text reveal">
+                    <span class="label">Contact</span>
+                    <h2 class="section-title">Let's build something together</h2>
+                    <p>Currently available for freelance and full-time work. The fastest way to reach me is email — I usually reply within a day.</p>
+                    <a href="mailto:hello@103pu.dev" class="contact-email">hello@103pu.dev</a>
+                    <div class="hero-socials" aria-label="Social links">
+                        <a href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 5 18 5.3 18 5.3c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg></a>
+                        <a href="https://dribbble.com/" target="_blank" rel="noopener" aria-label="Dribbble" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm7.9 5.5a10.1 10.1 0 0 1 2.3 6.3c-.3-.1-3.6-.7-6.9-.3-.1-.2-.1-.3-.2-.5-.2-.5-.5-1-.7-1.5 3.6-1.5 5.2-3.6 5.5-4zm-1.4-1.2c-.3.4-1.8 2.4-5.2 3.7A53 53 0 0 0 9.5 2.3a10.1 10.1 0 0 1 9 2zM7.7 3a64 64 0 0 1 3.7 5.6A36 36 0 0 1 2.6 9.7 10.1 10.1 0 0 1 7.7 3zM1.9 12v-.3c.3 0 5.2.1 9.9-1.3.3.5.5 1 .8 1.6l-.4.1c-4.9 1.6-7.4 5.9-7.6 6.3A10 10 0 0 1 1.9 12zm10.1 10a10 10 0 0 1-6.2-2.1c.2-.3 1.9-3.7 7.3-5.6 2.2 5.8 3.1 10.6 3.4 12a10 10 0 0 1-4.5.7zm6.3-1.7c-.2-1.1-1-5.6-3.1-11.3 3.1-.5 5.8.3 6.2.4a10 10 0 0 1-3.1 10.9z"/></svg></a>
+                        <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" rel="noopener" aria-label="Discord" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.3.5a14.7 14.7 0 0 1 4.3 1.4 13.6 13.6 0 0 0-11-.4l-.6.4A14.7 14.7 0 0 1 8.9 3.5L8.6 3a19.8 19.8 0 0 0-4.9 1.4C1.2 8 0.5 11.6 0.8 15a20 20 0 0 0 6 3l.6-1c-.7-.2-1.3-.5-1.9-.9l.5-.3a14 14 0 0 0 12 0l.5.3c-.6.4-1.2.7-1.9.9l.6 1a20 20 0 0 0 6-3c.4-4-.7-7.6-3.4-10.6zM8.3 13c-.9 0-1.7-.8-1.7-1.9s.7-1.9 1.7-1.9 1.7.9 1.7 1.9-.8 1.9-1.7 1.9zm7.4 0c-.9 0-1.7-.8-1.7-1.9s.7-1.9 1.7-1.9 1.7.9 1.7 1.9-.8 1.9-1.7 1.9z"/></svg></a>
+                        <a href="mailto:hello@103pu.dev" aria-label="Email" class="social-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a>
+                    </div>
                 </div>
-            </a>
-
-        </div>
-
-        <footer class="footer">
-            <p>103_PU Content Creator <i class="fa-solid fa-certificate verify-icon"></i> | CHILL</p>
-        </footer>
-
+                <form class="contact-form reveal" id="contactForm">
+                    <label>Name<input type="text" name="name" required placeholder="Your name"></label>
+                    <label>Email<input type="email" name="email" required placeholder="you@email.com"></label>
+                    <label>Project type
+                        <select name="type">
+                            <option>UI/UX Design</option>
+                            <option>Frontend Development</option>
+                            <option>Design System</option>
+                            <option>Full product</option>
+                            <option>Something else</option>
+                        </select>
+                    </label>
+                    <label>Message<textarea name="message" rows="4" required placeholder="Tell me about your project…"></textarea></label>
+                    <button type="submit" class="btn btn-primary">Send message <span aria-hidden="true">→</span></button>
+                </form>
+            </div>
+        </section>
     </main>
 
-    <div class="volume-container">
-        <div class="volume-icon">
-            <i class="fa-solid fa-volume-xmark" id="vol-icon"></i>
+    <!-- ===================== 08 / FOOTER ===================== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <a href="#hero" class="nav-logo" data-scroll>103_PU<span class="dot">.</span></a>
+            <nav class="footer-links">
+                <a href="#work" data-scroll>Work</a>
+                <a href="#about" data-scroll>About</a>
+                <a href="#contact" data-scroll>Contact</a>
+            </nav>
+            <p class="footer-copy">© <span id="year"></span> 103_PU. All rights reserved.</p>
+            <a href="#hero" class="back-top" data-scroll aria-label="Back to top">↑ Top</a>
         </div>
-        <input type="range" id="vol-slider" class="volume-slider" min="0" max="100" value="0">
-    </div>
-
-    <!-- ============================================== -->
-    <!-- DISCORD MODAL TẢI VALORANT TWEAKS -->
-    <!-- ============================================== -->
-    <div id="discord-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
-        <div class="modal-content" style="background: rgba(25, 25, 35, 0.95); border: 1px solid #ff4655; border-radius: 20px; padding: 35px 25px; max-width: 400px; width: 90%; text-align: center; color: white; box-shadow: 0 0 30px rgba(255, 70, 85, 0.2); transition: all 0.3s ease; transform: scale(0.9); opacity: 0;">
-
-            <!-- Discord Icon Header -->
-            <div style="background: rgba(88, 101, 242, 0.15); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fa-brands fa-discord" style="font-size: 40px; color: #5865F2;"></i>
-            </div>
-
-            <h3 style="font-size: 24px; margin-bottom: 12px; font-weight: 800; font-family: 'Outfit', sans-serif;">DOWNLOAD TWEAKS</h3>
-            <p style="color: #b0b0b0; margin-bottom: 30px; font-size: 15px; line-height: 1.6; font-family: 'Outfit', sans-serif;">
-                Để tải công cụ <strong>VALORANT TWEAKS</strong>, vui lòng tham gia Discord server của 103_PU và truy cập kênh <span style="color: #ff4655; font-weight: bold;">#val-tweaks</span>.
-            </p>
-
-            <!-- Buttons -->
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button onclick="closeDiscordModal()" style="flex: 1; padding: 12px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
-                    CANCEL
-                </button>
-
-                <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" onclick="closeDiscordModal()" style="flex: 1; padding: 12px 0; border-radius: 12px; border: none; background: #5865F2; color: white; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(88, 101, 242, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(88, 101, 242, 0.4)'">
-                    <i class="fa-brands fa-discord"></i> JOIN
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script xử lý Modal -->
-    <script>
-    function showDiscordModal(e) {
-        e.preventDefault();
-        const modal = document.getElementById('discord-modal');
-        modal.style.display = 'flex';
-        // Kích hoạt re-flow để chạy animation CSS
-        void modal.offsetWidth;
-        const content = modal.querySelector('.modal-content');
-        content.style.transform = 'scale(1)';
-        content.style.opacity = '1';
-    }
-
-    function closeDiscordModal() {
-        const modal = document.getElementById('discord-modal');
-        const content = modal.querySelector('.modal-content');
-        content.style.transform = 'scale(0.9)';
-        content.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300); // Đợi animation kết thúc mới ẩn hẳn div
-    }
-
-    // Bấm ra vùng đen bên ngoài cũng sẽ đóng popup
-    document.getElementById('discord-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDiscordModal();
-        }
-    });
-    </script>
+    </footer>
 
     <script src="./js/main.js"></script>
 </body>
