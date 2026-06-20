@@ -1,98 +1,126 @@
-// ============================================================
-// 103_PU PORTFOLIO — interactions
-// ============================================================
-(function () {
-    'use strict';
+// --- 1. CINEMATIC INTRO LOGIC ---
+function playIntro() {
+    const introOverlay = document.getElementById('cinematic-intro');
+    const body = document.body;
 
-    const navbar = document.getElementById('navbar');
-    const burger = document.getElementById('navBurger');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const themeToggle = document.getElementById('themeToggle');
-    const navLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+    // Timeline: 
+    // 0s: Line 1 (Welcome) hiện
+    // 1.5s: Line 2 (103_PU) hiện
+    // 4.0s: Intro mờ đi, web chính hiện ra
 
-    // --- 1. Navbar frosted-glass on scroll ---
-    const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    setTimeout(() => {
+        introOverlay.classList.add('fade-out');
+        body.classList.remove('is-loading');
+        body.classList.add('loaded');
+    }, 4000);
 
-    // --- 2. Mobile hamburger overlay ---
-    const setMenu = (open) => {
-        burger.classList.toggle('open', open);
-        mobileMenu.classList.toggle('open', open);
-        burger.setAttribute('aria-expanded', String(open));
-        mobileMenu.setAttribute('aria-hidden', String(!open));
-        document.body.style.overflow = open ? 'hidden' : '';
+    setTimeout(() => {
+        introOverlay.style.display = 'none';
+    }, 5000);
+}
+
+// Gọi intro
+playIntro();
+
+
+// --- 2. LOCAL VIDEO CONTROL LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('bg-video-player');
+    const volSlider = document.getElementById('vol-slider');
+    const volIcon = document.getElementById('vol-icon');
+    let lastVolume = 30; // Mức âm lượng mặc định khi bật tiếng
+
+    // Hàm cập nhật giao diện volume
+    const updateVolUI = (vol) => {
+        volSlider.value = vol;
+        volSlider.style.setProperty('--vol-percent', `${vol}%`);
+
+        // Cập nhật icon
+        if (vol == 0) {
+            volIcon.className = 'fa-solid fa-volume-xmark';
+        } else if (vol < 50) {
+            volIcon.className = 'fa-solid fa-volume-low';
+        } else {
+            volIcon.className = 'fa-solid fa-volume-high';
+        }
     };
-    burger.addEventListener('click', () => setMenu(!burger.classList.contains('open')));
 
-    // --- 3. Smooth scroll for in-page links (+ close mobile menu) ---
-    document.querySelectorAll('[data-scroll]').forEach((link) => {
-        link.addEventListener('click', (e) => {
-            const target = document.querySelector(link.getAttribute('href'));
-            if (!target) return;
-            e.preventDefault();
-            setMenu(false);
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
+    // Khởi tạo: Mute (Bắt buộc để Autoplay chạy được trên trình duyệt)
+    video.volume = 0;
+    updateVolUI(0);
+
+    // Xử lý khi kéo thanh trượt
+    volSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        video.muted = false; // Bỏ mute
+        video.volume = val / 100; // Video volume nhận giá trị 0.0 -> 1.0
+
+        if (val > 0) lastVolume = val;
+        updateVolUI(val);
     });
 
-    // --- 4. Active section highlight (Intersection Observer) ---
-    const sections = navLinks
-        .map((a) => document.querySelector(a.getAttribute('href')))
-        .filter(Boolean);
-
-    const spy = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            navLinks.forEach((a) =>
-                a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id)
-            );
-        });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    sections.forEach((s) => spy.observe(s));
-
-    // --- 5. Scroll entrance with stagger ---
-    const revealEls = document.querySelectorAll('.reveal');
-    const revealObs = new IntersectionObserver((entries, obs) => {
-        entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            const siblings = Array.from(entry.target.parentElement.querySelectorAll('.reveal'));
-            entry.target.style.transitionDelay = Math.max(0, siblings.indexOf(entry.target)) * 80 + 'ms';
-            entry.target.classList.add('in-view');
-            obs.unobserve(entry.target);
-        });
-    }, { threshold: 0.12 });
-    revealEls.forEach((el) => revealObs.observe(el));
-
-    // --- 6. Theme toggle (persisted) ---
-    const saved = localStorage.getItem('theme');
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
-    themeToggle.addEventListener('click', () => {
-        const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
+    // Xử lý khi bấm vào Icon Loa (Mute/Unmute Toggle)
+    volIcon.addEventListener('click', () => {
+        if (video.muted || video.volume === 0) {
+            // Đang tắt -> Bật lại mức cũ
+            video.muted = false;
+            let target = lastVolume > 0 ? lastVolume : 30;
+            video.volume = target / 100;
+            updateVolUI(target);
+        } else {
+            // Đang bật -> Tắt
+            lastVolume = volSlider.value; // Lưu lại mức hiện tại
+            video.muted = true;
+            updateVolUI(0);
+        }
     });
+});
 
-    // --- 7. Contact form -> mailto fallback (no real submit) ---
-    const form = document.getElementById('contactForm');
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const d = new FormData(form);
-            const subject = encodeURIComponent(`[Portfolio Contact] ${d.get('type')} — ${d.get('name')}`);
-            const body = encodeURIComponent(
-                `Xin chào Dũng,\n\n${d.get('message')}\n\n` +
-                `────────────────\n` +
-                `Từ: ${d.get('name')}\n` +
-                `Email: ${d.get('email')}\n` +
-                `Loại: ${d.get('type')}`
-            );
-            window.location.href = `mailto:dungbd2005@gmail.com?subject=${subject}&body=${body}`;
+
+// --- 3. SCROLL & TILT LOGIC (EXISTING) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.js-tilt');
+
+    const handleTilt = (e, card) => {
+        if (!card.classList.contains('in-view')) return;
+        const cardRect = card.getBoundingClientRect();
+        const centerX = cardRect.left + cardRect.width / 2;
+        const centerY = cardRect.top + cardRect.height / 2;
+        const rotateX = -((e.clientY - centerY) / 30);
+        const rotateY = ((e.clientX - centerX) / 30);
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+    };
+
+    const resetTilt = (card) => {
+        card.style.transform = '';
+    };
+
+    if (window.matchMedia('(hover: hover)').matches) {
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => handleTilt(e, card));
+            card.addEventListener('mouseleave', () => resetTilt(card));
         });
     }
 
-    // --- 8. Footer year ---
-    const year = document.getElementById('year');
-    if (year) year.textContent = new Date().getFullYear();
-})();
+    const observerOptions = {
+        threshold: 0.0075,
+        rootMargin: "10px"
+    };
 
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            const card = entry.target;
+            if (entry.isIntersecting) {
+                card.classList.add('in-view');
+            } else {
+                card.classList.remove('in-view');
+                card.style.transform = '';
+            }
+        });
+    }, observerOptions);
+
+    cards.forEach(card => {
+        observer.observe(card);
+    });
+});
