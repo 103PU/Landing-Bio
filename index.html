@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -9,13 +9,13 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Outfit:wght@300;500;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
 </head>
 
 <video id="bg-video-player" class="bg-video" autoplay muted loop playsinline>
-        <source src="/assets/Jumping Machine (跳楼机).mp3" type="music/mp3"></video>
+        <source src="/assets/Jumping Machine (è·³æ¥¼æœº).mp3" type="music/mp3"></video>
     </video>    
 <body class="is-loading">
 
@@ -82,6 +82,37 @@
                     <p class="card-sub">103_PU Keys</p>
                 </div>
             </a>
+
+            <section class="card card--nvidia-profile js-tilt" aria-label="NVIDIA Profile Config">
+                <div class="nvidia-scanline"></div>
+                <div class="card__content nvidia-profile-content">
+                    <div class="nvidia-profile-header">
+                        <div class="nvidia-title-group">
+                            <h3>NVIDIA Profile Config</h3>
+                            <span class="nvidia-title-chip">Potato presets</span>
+                        </div>
+                        <span class="nvidia-val-icon" aria-hidden="true">
+                            <img src="./assets/valorant-neon.svg" alt="">
+                        </span>
+                    </div>
+                    <div class="nvidia-metric-row">
+                        <span>Texture filtering - LOD Bias (DX)</span>
+                        <span>Texture filtering - LOD Bias (OGL)</span>
+                    </div>
+                    <div class="nvidia-table-wrap">
+                        <table class="nvidia-table">
+                            <thead>
+                                <tr><th>Mode</th><th>Hex value</th><th>Note</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Low</td><td><code class="copy-hex-value" data-copy="0x00000020" tabindex="0" role="button" aria-label="Copy 0x00000020">0x00000020</code></td><td></td></tr>
+                                <tr><td>Medium</td><td><code class="copy-hex-value" data-copy="0x00000032" tabindex="0" role="button" aria-label="Copy 0x00000032">0x00000032</code></td><td></td></tr>
+                                <tr><td>Ultra</td><td><code class="copy-hex-value" data-copy="0x00000076" tabindex="0" role="button" aria-label="Copy 0x00000076">0x00000076</code></td><td>Can't Scope Operator</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
             <div class="section-title title-social">
                 <span>/// SOCIAL MEDIA</span>
@@ -216,7 +247,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- DISCORD MODAL TẢI VALORANT TWEAKS -->
+    <!-- DISCORD MODAL Táº¢I VALORANT TWEAKS -->
     <!-- ============================================== -->
     <div id="discord-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
         <div class="modal-content" style="background: rgba(25, 25, 35, 0.95); border: 1px solid #ff4655; border-radius: 20px; padding: 35px 25px; max-width: 400px; width: 90%; text-align: center; color: white; box-shadow: 0 0 30px rgba(255, 70, 85, 0.2); transition: all 0.3s ease; transform: scale(0.9); opacity: 0;">
@@ -228,7 +259,7 @@
 
             <h3 style="font-size: 24px; margin-bottom: 12px; font-weight: 800; font-family: 'Outfit', sans-serif;">DOWNLOAD TWEAKS</h3>
             <p style="color: #b0b0b0; margin-bottom: 30px; font-size: 15px; line-height: 1.6; font-family: 'Outfit', sans-serif;">
-                Để tải công cụ <strong>VALORANT TWEAKS</strong>, vui lòng tham gia Discord server của 103_PU và truy cập kênh <span style="color: #ff4655; font-weight: bold;">#val-tweaks</span>.
+                Äá»ƒ táº£i cÃ´ng cá»¥ <strong>VALORANT TWEAKS</strong>, vui lÃ²ng tham gia Discord server cá»§a 103_PU vÃ  truy cáº­p kÃªnh <span style="color: #ff4655; font-weight: bold;">#val-tweaks</span>.
             </p>
 
             <!-- Buttons -->
@@ -244,13 +275,13 @@
         </div>
     </div>
 
-    <!-- Script xử lý Modal -->
+    <!-- Script xá»­ lÃ½ Modal -->
     <script>
     function showDiscordModal(e) {
         e.preventDefault();
         const modal = document.getElementById('discord-modal');
         modal.style.display = 'flex';
-        // Kích hoạt re-flow để chạy animation CSS
+        // KÃ­ch hoáº¡t re-flow Ä‘á»ƒ cháº¡y animation CSS
         void modal.offsetWidth;
         const content = modal.querySelector('.modal-content');
         content.style.transform = 'scale(1)';
@@ -264,10 +295,10 @@
         content.style.opacity = '0';
         setTimeout(() => {
             modal.style.display = 'none';
-        }, 300); // Đợi animation kết thúc mới ẩn hẳn div
+        }, 300); // Äá»£i animation káº¿t thÃºc má»›i áº©n háº³n div
     }
 
-    // Bấm ra vùng đen bên ngoài cũng sẽ đóng popup
+    // Báº¥m ra vÃ¹ng Ä‘en bÃªn ngoÃ i cÅ©ng sáº½ Ä‘Ã³ng popup
     document.getElementById('discord-modal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeDiscordModal();

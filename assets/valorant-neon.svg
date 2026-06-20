@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 110" fill="none">
+  <defs>
+    <filter id="neon" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 1 0 0.22 0 0 0.1 0 0 0.16 0 0.08 0 0 0 0.95 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#neon)" stroke="#ff6a6a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M20 8v46l42 46h46L20 8Z"/>
+    <path d="M140 8v36l-30 30H72L140 8Z"/>
+  </g>
+  <g stroke="#ffd0d0" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.95">
+    <path d="M20 8v46l42 46h46L20 8Z"/>
+    <path d="M140 8v36l-30 30H72L140 8Z"/>
+  </g>
+</svg>

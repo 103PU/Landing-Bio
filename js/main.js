@@ -124,3 +124,41 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(card);
     });
 });
+
+const copyHexValue = async (element) => {
+    const value = element.dataset.copy;
+    element.classList.add('is-copied');
+    element.textContent = 'Copied';
+    setTimeout(() => {
+        element.classList.remove('is-copied');
+        element.textContent = value;
+    }, 900);
+
+    try {
+        await navigator.clipboard.writeText(value);
+    } catch {
+        const fallback = document.createElement('textarea');
+        fallback.value = value;
+        fallback.setAttribute('readonly', '');
+        fallback.style.position = 'fixed';
+        fallback.style.opacity = '0';
+        document.body.appendChild(fallback);
+        fallback.select();
+        document.execCommand('copy');
+        fallback.remove();
+    }
+};
+
+document.addEventListener('click', (event) => {
+    const element = event.target.closest('.copy-hex-value');
+    if (!element) return;
+    copyHexValue(element);
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const element = event.target.closest('.copy-hex-value');
+    if (!element) return;
+    event.preventDefault();
+    copyHexValue(element);
+});
