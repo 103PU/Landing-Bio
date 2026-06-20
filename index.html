@@ -6,6 +6,7 @@
     <title>103_PU | Gaming Creator</title>
     
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" href="./assets/avatar.jpg">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +15,7 @@
     
 </head>
 
-<video id="bg-video-player" class="bg-video" autoplay muted loop playsinline>
-        <source src="/assets/Jumping Machine (è·³æ¥¼æœº).mp3" type="music/mp3"></video>
-    </video>    
+<video id="bg-video-player" class="bg-video" autoplay muted loop playsinline></video>
 <body class="is-loading">
 
     <div id="cinematic-intro">
@@ -247,7 +246,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- DISCORD MODAL Táº¢I VALORANT TWEAKS -->
+    <!-- DISCORD MODAL TẢI VALORANT TWEAKS -->
     <!-- ============================================== -->
     <div id="discord-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
         <div class="modal-content" style="background: rgba(25, 25, 35, 0.95); border: 1px solid #ff4655; border-radius: 20px; padding: 35px 25px; max-width: 400px; width: 90%; text-align: center; color: white; box-shadow: 0 0 30px rgba(255, 70, 85, 0.2); transition: all 0.3s ease; transform: scale(0.9); opacity: 0;">
@@ -259,7 +258,7 @@
 
             <h3 style="font-size: 24px; margin-bottom: 12px; font-weight: 800; font-family: 'Outfit', sans-serif;">DOWNLOAD TWEAKS</h3>
             <p style="color: #b0b0b0; margin-bottom: 30px; font-size: 15px; line-height: 1.6; font-family: 'Outfit', sans-serif;">
-                Äá»ƒ táº£i cÃ´ng cá»¥ <strong>VALORANT TWEAKS</strong>, vui lÃ²ng tham gia Discord server cá»§a 103_PU vÃ  truy cáº­p kÃªnh <span style="color: #ff4655; font-weight: bold;">#val-tweaks</span>.
+                Để tải công cụ <strong>VALORANT TWEAKS</strong>, vui lòng tham gia Discord server của 103_PU và truy cập kênh <span style="color: #ff4655; font-weight: bold;">#val-tweaks</span>.
             </p>
 
             <!-- Buttons -->
@@ -275,13 +274,13 @@
         </div>
     </div>
 
-    <!-- Script xá»­ lÃ½ Modal -->
+    <!-- Script xử lý Modal -->
     <script>
     function showDiscordModal(e) {
         e.preventDefault();
         const modal = document.getElementById('discord-modal');
         modal.style.display = 'flex';
-        // KÃ­ch hoáº¡t re-flow Ä‘á»ƒ cháº¡y animation CSS
+        // Kích hoạt re-flow để chạy animation CSS
         void modal.offsetWidth;
         const content = modal.querySelector('.modal-content');
         content.style.transform = 'scale(1)';
@@ -295,10 +294,10 @@
         content.style.opacity = '0';
         setTimeout(() => {
             modal.style.display = 'none';
-        }, 300); // Äá»£i animation káº¿t thÃºc má»›i áº©n háº³n div
+        }, 300); // Đợi animation kết thúc mới ẩn hẳn div
     }
 
-    // Báº¥m ra vÃ¹ng Ä‘en bÃªn ngoÃ i cÅ©ng sáº½ Ä‘Ã³ng popup
+    // Bấm ra vùng đen bên ngoài cũng sẽ đóng popup
     document.getElementById('discord-modal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeDiscordModal();
