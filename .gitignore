@@ -1,0 +1,15 @@
+# Khong commit file nen va tai lieu ca nhan (CV, giay to)
+*.zip
+*.pdf
+IMG_*.jpeg
+IMG_*.jpg
+
+# Anh chup + log do kiem (CDP audit), chi dung o may local
+.audit-shots/
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.idea/

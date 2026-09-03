@@ -1,80 +1,57 @@
 // --- 1. CINEMATIC INTRO LOGIC ---
+// Intro vẫn giữ nguyên, chỉ bỏ ba thứ làm nó trở thành cổng chặn:
+//   - 4s không có cách nào thoát  -> có nút SKIP, bấm đâu cũng skip được
+//   - chạy lại mỗi lần vào trang  -> sessionStorage, chỉ chạy 1 lần / phiên
+//   - reduced-motion vẫn phải xem -> bỏ qua hẳn
+const INTRO_KEY = 'pu_intro_seen';
+
 function playIntro() {
     const introOverlay = document.getElementById('cinematic-intro');
+    const skipBtn = document.getElementById('intro-skip');
     const body = document.body;
+    let done = false;
 
-    // Timeline: 
-    // 0s: Line 1 (Welcome) hiện
-    // 1.5s: Line 2 (103_PU) hiện
-    // 4.0s: Intro mờ đi, web chính hiện ra
-
-    setTimeout(() => {
+    const finish = () => {
+        if (done) return;
+        done = true;
         introOverlay.classList.add('fade-out');
         body.classList.remove('is-loading');
         body.classList.add('loaded');
-    }, 4000);
+        try { sessionStorage.setItem(INTRO_KEY, '1'); } catch { /* private mode */ }
+        setTimeout(() => { introOverlay.style.display = 'none'; }, 1000);
+    };
 
-    setTimeout(() => {
+    // Đã xem trong phiên này, hoặc user tắt animation -> vào thẳng nội dung.
+    const seen = (() => { try { return sessionStorage.getItem(INTRO_KEY) === '1'; } catch { return false; } })();
+    const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (seen || noMotion) {
         introOverlay.style.display = 'none';
-    }, 5000);
+        body.classList.remove('is-loading');
+        body.classList.add('loaded');
+        return;
+    }
+
+    // Timeline: 0s line-1, 0.9s line-2, 2.2s nhả trang (trước là 4s).
+    setTimeout(finish, 2200);
+
+    // Thoát bằng nút, bằng tap bất kỳ đâu, hoặc bằng Esc / Enter / Space.
+    introOverlay.style.pointerEvents = 'auto';
+    skipBtn?.addEventListener('click', finish);
+    introOverlay.addEventListener('click', finish);
+    introOverlay.addEventListener('touchstart', finish, { passive: true });
+    document.addEventListener('keydown', (e) => {
+        if (!done && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) finish();
+    });
 }
 
 // Gọi intro
 playIntro();
 
 
-// --- 2. LOCAL VIDEO CONTROL LOGIC ---
-document.addEventListener('DOMContentLoaded', () => {
-    const video = document.getElementById('bg-video-player');
-    const volSlider = document.getElementById('vol-slider');
-    const volIcon = document.getElementById('vol-icon');
-    let lastVolume = 30; // Mức âm lượng mặc định khi bật tiếng
-
-    // Hàm cập nhật giao diện volume
-    const updateVolUI = (vol) => {
-        volSlider.value = vol;
-        volSlider.style.setProperty('--vol-percent', `${vol}%`);
-
-        // Cập nhật icon
-        if (vol == 0) {
-            volIcon.className = 'fa-solid fa-volume-xmark';
-        } else if (vol < 50) {
-            volIcon.className = 'fa-solid fa-volume-low';
-        } else {
-            volIcon.className = 'fa-solid fa-volume-high';
-        }
-    };
-
-    // Khởi tạo: Mute (Bắt buộc để Autoplay chạy được trên trình duyệt)
-    video.volume = 0;
-    updateVolUI(0);
-
-    // Xử lý khi kéo thanh trượt
-    volSlider.addEventListener('input', (e) => {
-        const val = e.target.value;
-        video.muted = false; // Bỏ mute
-        video.volume = val / 100; // Video volume nhận giá trị 0.0 -> 1.0
-
-        if (val > 0) lastVolume = val;
-        updateVolUI(val);
-    });
-
-    // Xử lý khi bấm vào Icon Loa (Mute/Unmute Toggle)
-    volIcon.addEventListener('click', () => {
-        if (video.muted || video.volume === 0) {
-            // Đang tắt -> Bật lại mức cũ
-            video.muted = false;
-            let target = lastVolume > 0 ? lastVolume : 30;
-            video.volume = target / 100;
-            updateVolUI(target);
-        } else {
-            // Đang bật -> Tắt
-            lastVolume = volSlider.value; // Lưu lại mức hiện tại
-            video.muted = true;
-            updateVolUI(0);
-        }
-    });
-});
+// --- 2. (đã bỏ) LOCAL VIDEO CONTROL ---
+// <video id="bg-video-player"> không có src và không có <source> nào, nên thanh
+// volume điều khiển một thứ không tồn tại — mà vẫn che bảng NVIDIA trên mobile.
+// Cả thẻ video, .volume-container và ~50 dòng JS ở đây đều đã xoá.
 
 
 // --- 3. SCROLL & TILT LOGIC (EXISTING) ---
@@ -110,13 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            const card = entry.target;
-            if (entry.isIntersecting) {
-                card.classList.add('in-view');
-            } else {
-                card.classList.remove('in-view');
-                card.style.transform = '';
-            }
+            if (!entry.isIntersecting) return;
+            // Hiện một lần rồi thôi. Trước đây .in-view bị remove khi card ra khỏi
+            // màn hình, nên animation chạy lại mỗi lần scroll qua — vừa rối mắt vừa
+            // làm card biến mất khi scroll lên lại.
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
         });
     }, observerOptions);
 
@@ -127,16 +103,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const copyHexValue = async (element) => {
     const value = element.dataset.copy;
-    element.classList.add('is-copied');
-    element.textContent = 'Copied';
-    setTimeout(() => {
-        element.classList.remove('is-copied');
-        element.textContent = value;
-    }, 900);
 
+    const flash = (label, ok) => {
+        element.classList.toggle('is-copied', ok);
+        element.classList.toggle('is-copy-failed', !ok);
+        element.textContent = label;
+        setTimeout(() => {
+            element.classList.remove('is-copied', 'is-copy-failed');
+            element.textContent = value;
+        }, 900);
+    };
+
+    // Chỉ báo "Copied" SAU khi copy thành công thật. Trước đây nó báo thành công
+    // ngay từ đầu, nên clipboard bị chặn mà user vẫn tưởng đã copy được.
     try {
         await navigator.clipboard.writeText(value);
-    } catch {
+        flash('Copied', true);
+        return;
+    } catch { /* thử cách cũ bên dưới */ }
+
+    try {
         const fallback = document.createElement('textarea');
         fallback.value = value;
         fallback.setAttribute('readonly', '');
@@ -144,8 +130,11 @@ const copyHexValue = async (element) => {
         fallback.style.opacity = '0';
         document.body.appendChild(fallback);
         fallback.select();
-        document.execCommand('copy');
+        const ok = document.execCommand('copy');
         fallback.remove();
+        flash(ok ? 'Copied' : 'Copy failed', ok);
+    } catch {
+        flash('Copy failed', false);
     }
 };
 

@@ -1,29 +1,59 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>103_PU | Gaming Creator</title>
-    
+    <title>103_PU | Gaming Creator &amp; Streamer</title>
+
+    <!-- Share preview: this is the only part of the page that works BEFORE the page
+         loads, and it decides whether the tap happens at all. -->
+    <meta name="description" content="103_PU — Gaming Creator &amp; Streamer. TikTok, YouTube, Discord, cùng tool Valorant Tweaks và bảng NVIDIA profile config.">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="103_PU | Gaming Creator &amp; Streamer">
+    <meta property="og:description" content="Tất cả link của 103_PU: TikTok, YouTube, Discord, Valorant Tweaks, NVIDIA config.">
+    <meta property="og:image" content="./assets/avatar.jpg">
+    <meta property="og:url" content="https://103punewbio.vercel.app/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="103_PU | Gaming Creator &amp; Streamer">
+    <meta name="twitter:description" content="Tất cả link của 103_PU: TikTok, YouTube, Discord, Valorant Tweaks, NVIDIA config.">
+    <meta name="twitter:image" content="./assets/avatar.jpg">
+
+    <!-- Runs before any stylesheet, so a slow CDN can never delay it.
+         CSS keys every JS-gated hidden state off .js: without it the page renders fully visible. -->
+    <script>document.documentElement.classList.add('js');</script>
+
     <link rel="stylesheet" href="./css/style.css">
     <link rel="icon" href="./assets/avatar.jpg">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Outfit:wght@300;500;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Third-party CSS loaded non-blocking. An external stylesheet blocks script
+         execution, so a hung CDN used to stall js/main.js and leave the page
+         permanently blurred with zero visible links. -->
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Outfit:wght@300;500;800&family=Space+Mono:wght@700&display=swap">
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Outfit:wght@300;500;800&family=Space+Mono:wght@700&display=swap">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
     
 </head>
 
-<video id="bg-video-player" class="bg-video" autoplay muted loop playsinline></video>
 <body class="is-loading">
 
     <div id="cinematic-intro">
-        <div class="intro-bg"></div> 
+        <div class="intro-bg"></div>
         <div class="intro-content">
             <div class="intro-line line-1">WELCOME TO MY UNIVERSE</div>
             <div class="intro-line line-2">103_PU</div>
         </div>
+        <!-- The intro used to hold every link hostage for 4s with no way out.
+             It still plays, but now it is skippable and only once per session. -->
+        <button type="button" id="intro-skip" class="intro-skip">SKIP &rsaquo;</button>
     </div>
 
     <div class="bg-overlay"></div>
@@ -48,6 +78,57 @@
                 </div>
             </div>
 
+            <div class="section-title title-social">
+                <span>/// SOCIAL MEDIA</span>
+                <div class="line"></div>
+            </div>
+
+            <a href="https://www.tiktok.com/@103_pu_" target="_blank" rel="noopener" class="card card--tiktok js-tilt">
+                <div class="animated-border"></div>
+                <div class="card__bg-icon"><i class="fa-brands fa-tiktok"></i></div>
+                <div class="card__content">
+                    <div class="card__header">
+                        <i class="fa-brands fa-tiktok card__icon"></i>
+                        <span class="card__badge">Main Channel</span>
+                    </div>
+                    <div class="card__body tiktok-body-layout">
+                        <div class="tiktok-text-group">
+                            <h3>TikTok Channel</h3>
+                            <p>Highlights & Funny Moments</p>
+                        </div>
+                        <div class="tiktok-channel-img">
+                            <img src="./assets/avatar.jpg" onerror="this.src='https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/6b019e6b8d5c478b318b823587458e5d~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=f8f77826&x-expires=1765220400&x-signature=%2FX%2FqxOSJEw1hiEwjFHn5iFemMJc%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my3'" alt="TikTok Logo">
+                        </div>
+                    </div>
+                    <div class="card__arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+            </a>
+
+            <a href="https://www.youtube.com/@103_PU-tiktoker?sub_confirmation=1" target="_blank" rel="noopener" class="card card--square card--youtube-neon js-tilt">
+                <div class="rotate-layer"></div>
+                <div class="mask-layer"></div>
+                <div class="card__content center-content">
+                    <div class="icon-wrapper icon-pulse">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <h3 class="card-title">YouTube</h3>
+                    <p class="card-sub">Subscribe For Me</p>
+                </div>
+            </a>
+
+            <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" rel="noopener" class="card card--square card--discord js-tilt">
+                <div class="rotate-layer"></div>
+                <div class="mask-layer"></div>
+                <div class="card__content center-content">
+                    <div class="icon-wrapper icon-float">
+                        <i class="fa-brands fa-discord"></i>
+                    </div>
+                    <h3 class="card-title">Discord</h3>
+                    <p class="card-sub">Join My Server</p>
+                    <div class="online-dot"></div>
+                </div>
+            </a>
+
             <!-- ============================================== -->
             <!-- SECTION: VALORANT TOOLS -->
             <!-- ============================================== -->
@@ -70,7 +151,7 @@
             </a>
 
             <!-- Card 2: LICENSE PAGE -->
-            <a href="https://keylicensedashboard.dungbd2005.workers.dev/" target="_blank" class="card card--square card--license js-tilt">
+            <a href="https://keylicensedashboard.dungbd2005.workers.dev/" target="_blank" rel="noopener" class="card card--square card--license js-tilt">
                 <div class="rotate-layer"></div>
                 <div class="mask-layer"></div>
                 <div class="card__content center-content">
@@ -95,8 +176,8 @@
                         </span>
                     </div>
                     <div class="nvidia-metric-row">
-                        <span>Texture filtering - LOD Bias (DX)</span>
-                        <span>Texture filtering - LOD Bias (OGL)</span>
+                        <span>Texture filtering - LOD Bias (DX)<em>Đặt bằng Hex value ở bảng dưới</em></span>
+                        <span>Texture filtering - LOD Bias (OGL)<em>Đặt cùng giá trị với DX</em></span>
                     </div>
                     <div class="nvidia-table-wrap">
                         <table class="nvidia-table">
@@ -113,63 +194,12 @@
                 </div>
             </section>
 
-            <div class="section-title title-social">
-                <span>/// SOCIAL MEDIA</span>
-                <div class="line"></div>
-            </div>
-
-            <a href="https://www.tiktok.com/@103_pu_" target="_blank" class="card card--tiktok js-tilt">
-                <div class="animated-border"></div>
-                <div class="card__bg-icon"><i class="fa-brands fa-tiktok"></i></div>
-                <div class="card__content">
-                    <div class="card__header">
-                        <i class="fa-brands fa-tiktok card__icon"></i>
-                        <span class="card__badge">Main Channel</span>
-                    </div>
-                    <div class="card__body tiktok-body-layout">
-                        <div class="tiktok-text-group">
-                            <h3>TikTok Channel</h3>
-                            <p>Highlights & Funny Moments</p>
-                        </div>
-                        <div class="tiktok-channel-img">
-                            <img src="./assets/avatar.jpg" onerror="this.src='https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/6b019e6b8d5c478b318b823587458e5d~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=f8f77826&x-expires=1765220400&x-signature=%2FX%2FqxOSJEw1hiEwjFHn5iFemMJc%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my3'" alt="TikTok Logo">
-                        </div>
-                    </div>
-                    <div class="card__arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
-                </div>
-            </a>
-
-            <a href="https://www.youtube.com/@103_PU-tiktoker?sub_confirmation=1" target="_blank" class="card card--square card--youtube-neon js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-pulse">
-                        <i class="fa-brands fa-youtube"></i>
-                    </div>
-                    <h3 class="card-title">YouTube</h3>
-                    <p class="card-sub">Subscribe For Me</p>
-                </div>
-            </a>
-
-            <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" class="card card--square card--discord js-tilt">
-                <div class="rotate-layer"></div>
-                <div class="mask-layer"></div>
-                <div class="card__content center-content">
-                    <div class="icon-wrapper icon-float">
-                        <i class="fa-brands fa-discord"></i>
-                    </div>
-                    <h3 class="card-title">Discord</h3>
-                    <p class="card-sub">Join My Server</p>
-                    <div class="online-dot"></div>
-                </div>
-            </a>
-
             <div class="section-title title-game">
                 <span>[ GAME ZONE ]</span>
                 <div class="line"></div>
             </div>
 
-            <a href="https://valorant.vnggames.com/vi-vn/top-1-fps-phong-may/" target="_blank" class="card card--wide card--valorant js-tilt">
+            <a href="https://valorant.vnggames.com/vi-vn/top-1-fps-phong-may/" target="_blank" rel="noopener" class="card card--wide card--valorant js-tilt">
                 <div class="card__bg-glow-val"></div>
                 <div class="card__content row-content">
                     <div class="valorant-logo-box">
@@ -185,7 +215,10 @@
                 </div>
             </a>
 
-            <a href="https://www.roblox.com/Login" target="_blank" class="card card--square card--roblox js-tilt">
+            <!-- Trước đây là roblox.com/Login (form đăng nhập, không phải profile).
+                 Roblox không có URL dạng @handle: profile chuẩn là /users/<id>/profile.
+                 id 3889143682 = username 103_PU, xác nhận qua users.roblox.com API. -->
+            <a href="https://www.roblox.com/users/3889143682/profile" target="_blank" rel="noopener" class="card card--square card--roblox js-tilt">
                 <div class="rotate-layer"></div>
                 <div class="mask-layer"></div>
                 <div class="card__content center-content">
@@ -199,7 +232,7 @@
                 </div>
             </a>
 
-            <a href="https://zingspeedm.vnggames.com/" target="_blank" class="card card--square card--zingspeed js-tilt">
+            <a href="https://zingspeedm.vnggames.com/" target="_blank" rel="noopener" class="card card--square card--zingspeed js-tilt">
                 <div class="rotate-layer"></div>
                 <div class="mask-layer"></div>
                 <div class="speed-lines"></div>
@@ -217,7 +250,7 @@
                 <div class="line"></div>
             </div>
 
-            <a href="https://beacons.ai/103_pu/" target="_blank" class="card card--wide card--beacons js-tilt">
+            <a href="https://beacons.ai/103_pu/" target="_blank" rel="noopener" class="card card--wide card--beacons js-tilt">
                 <div class="card__content row-content">
                     <div class="icon-box-small">
                         <img src="https://beacons.ai/favicon.ico" onerror="this.src='data:image/svg+xml;base64,...'" alt="Beacons" class="other-logo-img">
@@ -238,17 +271,10 @@
 
     </main>
 
-    <div class="volume-container">
-        <div class="volume-icon">
-            <i class="fa-solid fa-volume-xmark" id="vol-icon"></i>
-        </div>
-        <input type="range" id="vol-slider" class="volume-slider" min="0" max="100" value="0">
-    </div>
-
     <!-- ============================================== -->
     <!-- DISCORD MODAL TẢI VALORANT TWEAKS -->
     <!-- ============================================== -->
-    <div id="discord-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+    <div id="discord-modal" role="dialog" aria-modal="true" aria-labelledby="discord-modal-title" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 15, 0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
         <div class="modal-content" style="background: rgba(25, 25, 35, 0.95); border: 1px solid #ff4655; border-radius: 20px; padding: 35px 25px; max-width: 400px; width: 90%; text-align: center; color: white; box-shadow: 0 0 30px rgba(255, 70, 85, 0.2); transition: all 0.3s ease; transform: scale(0.9); opacity: 0;">
 
             <!-- Discord Icon Header -->
@@ -256,7 +282,7 @@
                 <i class="fa-brands fa-discord" style="font-size: 40px; color: #5865F2;"></i>
             </div>
 
-            <h3 style="font-size: 24px; margin-bottom: 12px; font-weight: 800; font-family: 'Outfit', sans-serif;">DOWNLOAD TWEAKS</h3>
+            <h3 id="discord-modal-title" style="font-size: 24px; margin-bottom: 12px; font-weight: 800; font-family: 'Outfit', sans-serif;">DOWNLOAD TWEAKS</h3>
             <p style="color: #b0b0b0; margin-bottom: 30px; font-size: 15px; line-height: 1.6; font-family: 'Outfit', sans-serif;">
                 Để tải công cụ <strong>VALORANT TWEAKS</strong>, vui lòng tham gia Discord server của 103_PU và truy cập kênh <span style="color: #ff4655; font-weight: bold;">#val-tweaks</span>.
             </p>
@@ -267,7 +293,7 @@
                     CANCEL
                 </button>
 
-                <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" onclick="closeDiscordModal()" style="flex: 1; padding: 12px 0; border-radius: 12px; border: none; background: #5865F2; color: white; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(88, 101, 242, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(88, 101, 242, 0.4)'">
+                <a href="https://discord.com/invite/k3yUgsYVcB" target="_blank" rel="noopener" onclick="closeDiscordModal()" style="flex: 1; padding: 12px 0; border-radius: 12px; border: none; background: #5865F2; color: white; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(88, 101, 242, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(88, 101, 242, 0.4)'">
                     <i class="fa-brands fa-discord"></i> JOIN
                 </a>
             </div>
@@ -276,33 +302,46 @@
 
     <!-- Script xử lý Modal -->
     <script>
-    function showDiscordModal(e) {
-        e.preventDefault();
-        const modal = document.getElementById('discord-modal');
-        modal.style.display = 'flex';
-        // Kích hoạt re-flow để chạy animation CSS
-        void modal.offsetWidth;
-        const content = modal.querySelector('.modal-content');
-        content.style.transform = 'scale(1)';
-        content.style.opacity = '1';
-    }
-
-    function closeDiscordModal() {
+    (() => {
         const modal = document.getElementById('discord-modal');
         const content = modal.querySelector('.modal-content');
-        content.style.transform = 'scale(0.9)';
-        content.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300); // Đợi animation kết thúc mới ẩn hẳn div
-    }
+        let hideTimer = null;      // timer cũ không được quản lý: mở lại trong 300ms
+        let lastFocus = null;      // là bị chính nó đóng lại ngay.
 
-    // Bấm ra vùng đen bên ngoài cũng sẽ đóng popup
-    document.getElementById('discord-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDiscordModal();
-        }
-    });
+        window.showDiscordModal = (e) => {
+            if (e) e.preventDefault();
+            clearTimeout(hideTimer);
+            lastFocus = document.activeElement;
+            modal.style.display = 'flex';
+            void modal.offsetWidth;                    // re-flow để CSS transition chạy
+            content.style.transform = 'scale(1)';
+            content.style.opacity = '1';
+            modal.querySelector('a, button')?.focus();
+        };
+
+        window.closeDiscordModal = () => {
+            clearTimeout(hideTimer);
+            content.style.transform = 'scale(0.9)';
+            content.style.opacity = '0';
+            hideTimer = setTimeout(() => { modal.style.display = 'none'; }, 300);
+            lastFocus?.focus();                        // trả focus về chỗ đã bấm
+        };
+
+        // Bấm ra vùng đen bên ngoài cũng sẽ đóng popup
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeDiscordModal(); });
+
+        // Esc để đóng, và giữ Tab lại trong modal khi nó đang mở.
+        document.addEventListener('keydown', (e) => {
+            if (modal.style.display !== 'flex') return;
+            if (e.key === 'Escape') { closeDiscordModal(); return; }
+            if (e.key !== 'Tab') return;
+            const stops = [...modal.querySelectorAll('a[href], button')];
+            if (!stops.length) return;
+            const first = stops[0], last = stops[stops.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+    })();
     </script>
 
     <script src="./js/main.js"></script>

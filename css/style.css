@@ -43,40 +43,6 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* ================= LOCAL VIDEO BACKGROUND (FULL SCREEN FIX) ================= */
-.bg-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    /* Sử dụng viewport width */
-    height: 100vh;
-    /* Sử dụng viewport height */
-    z-index: -5;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.bg-video video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    /* KỸ THUẬT FULL SCREEN CHUẨN: */
-    /* Đảm bảo video luôn tối thiểu bằng chiều rộng/cao màn hình */
-    min-width: 100%;
-    min-height: 100%;
-    /* Cho phép video tự mở rộng để giữ tỷ lệ */
-    width: auto;
-    height: auto;
-
-    /* Cắt bỏ phần thừa để không bị méo hình */
-    object-fit: cover;
-
-    opacity: 0.6;
-    /* Giảm độ sáng video một chút */
-}
 
 .bg-overlay {
     position: fixed;
@@ -175,12 +141,30 @@ body {
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    opacity: 0;
-    transform: translateY(50px) scale(0.95);
     transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s, box-shadow 0.3s;
     will-change: transform, opacity;
     backface-visibility: hidden;
     z-index: 0;
+}
+
+/* Entrance state applies only when JS is present to lift it. Without .js every
+   card renders in its final position, so the page is readable with no JS at all
+   instead of being 11 invisible boxes.
+   card-force-reveal covers the other failure mode: .js is set but js/main.js
+   never runs, which would otherwise leave the IntersectionObserver's opacity: 0
+   in place forever. Trade-off: a card still below the fold at 6s reveals
+   without its scroll animation. Guaranteed visibility beats the effect. */
+html.js .card:not(.in-view) {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+    animation: card-force-reveal 0.5s ease 6s forwards;
+}
+
+@keyframes card-force-reveal {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .card.in-view {
@@ -214,110 +198,6 @@ body {
     z-index: 5;
 }
 
-/* ================= VOLUME CONTROL UI ================= */
-.volume-container {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(20, 20, 20, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    padding: 14px 24px;
-    border-radius: 60px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    transition: all 0.3s ease;
-    opacity: 0;
-    animation: fadeInUp 1s 1.5s forwards;
-}
-
-.volume-container:hover {
-    border-color: var(--color-tiktok);
-    background: rgba(30, 30, 30, 0.9);
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.volume-icon {
-    color: #fff;
-    width: 28px;
-    text-align: center;
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: transform 0.2s, color 0.3s;
-}
-
-.volume-icon:active {
-    transform: scale(0.9);
-}
-
-.volume-icon:hover {
-    color: var(--color-tiktok);
-}
-
-.volume-slider {
-    width: 110px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    outline: none;
-    cursor: pointer;
-    -webkit-appearance: none;
-}
-
-.volume-slider::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 5px;
-    cursor: pointer;
-    background: linear-gradient(90deg, var(--color-tiktok) var(--vol-percent, 0%), rgba(255, 255, 255, 0.2) var(--vol-percent, 0%));
-    border-radius: 5px;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0, 242, 234, 0.5);
-    margin-top: -5.5px;
-    transition: transform 0.2s;
-}
-
-.volume-slider:hover::-webkit-slider-thumb {
-    transform: scale(1.3);
-}
-
-/* --- Mobile Fixes --- */
-@media (max-width: 600px) {
-    .volume-container {
-        bottom: 25px;
-        left: 25px;
-        padding: 16px 22px;
-    }
-
-    .volume-icon {
-        font-size: 1.5rem;
-    }
-
-    .volume-slider {
-        width: 90px;
-    }
-}
 
 /* ================= COMPONENT STYLES ================= */
 .card--profile {
@@ -1071,20 +951,32 @@ body.is-loading {
     overflow: hidden;
 }
 
-body.is-loading .main-wrapper,
-body.is-loading .volume-container,
-body.is-loading .bg-text-effect,
-body.is-loading .bg-video {
+/* Gated on html.js so the page is never hidden when JS is unavailable.
+   visibility: hidden (not just opacity) also removes every link from the tab
+   order and from hit-testing, so a tap during the gate can no longer navigate
+   off-site from a blank screen.
+   force-reveal is a CSS-only failsafe: if js/main.js never executes, the blur
+   still lifts on its own instead of leaving a permanently unreadable page. */
+html.js body.is-loading .main-wrapper,
+html.js body.is-loading .bg-text-effect {
     opacity: 0;
+    visibility: hidden;
     filter: blur(20px);
     transform: scale(1);
     transition: none;
+    animation: force-reveal 0.3s ease 3s forwards;
+}
+
+@keyframes force-reveal {
+    to {
+        opacity: 1;
+        visibility: visible;
+        filter: none;
+    }
 }
 
 body.loaded .main-wrapper,
-body.loaded .volume-container,
-body.loaded .bg-text-effect,
-body.loaded .bg-video {
+body.loaded .bg-text-effect {
     opacity: 1;
     filter: blur(0);
     transform: scale(1);
@@ -1103,6 +995,16 @@ body.loaded .bg-video {
     justify-content: center;
     align-items: center;
     pointer-events: none;
+    /* CSS-only failsafe. #cinematic-intro.fade-out below is more specific, so
+       when js/main.js runs it still drives the exit at 2.2s; this delayed copy
+       only matters when main.js never executes, where it stops the overlay
+       from covering the first screen forever. */
+    animation: elegantFadeOut 1s ease 3s forwards;
+}
+
+/* No JS means no intro to play, so do not spend the first viewport on it. */
+html:not(.js) #cinematic-intro {
+    display: none;
 }
 
 .intro-bg {
@@ -1370,6 +1272,9 @@ body.loaded .bg-video {
 }
 
 .nvidia-metric-row span {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     padding: 10px 12px;
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.045);
@@ -1378,6 +1283,16 @@ body.loaded .bg-video {
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.03em;
+}
+
+/* These two pills used to be bare setting names with no value, so they told the
+   reader nothing they could act on. The sub-line is the missing instruction. */
+.nvidia-metric-row em {
+    font-style: normal;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(216, 255, 224, 0.62);
 }
 
 .nvidia-table-wrap {
@@ -1504,4 +1419,103 @@ body.loaded .bg-video {
     font-weight: 900;
     color: #ff4655;
     text-shadow: 0 0 12px rgba(255, 70, 85, 0.85);
+}
+
+/* ==============================================
+   SKIP INTRO
+   ============================================== */
+
+.intro-skip {
+    position: absolute;
+    bottom: 40px;
+    right: 24px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.82);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    z-index: 2;
+    /* Xuất hiện muộn hơn intro một nhịp để không giành sự chú ý với dòng chữ. */
+    opacity: 0;
+    animation: introSkipIn 0.4s ease 0.7s forwards;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.intro-skip:hover,
+.intro-skip:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #ffffff;
+}
+
+@keyframes introSkipIn {
+    to { opacity: 1; }
+}
+
+/* ==============================================
+   FOCUS — bàn phím thấy được mình đang ở đâu
+   Cả trang trước đây chỉ có đúng 1 :focus-visible, nên tab qua 12 link là
+   tab trong bóng tối. Ring chỉ hiện khi dùng bàn phím, chuột không thấy gì.
+   ============================================== */
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid #00f0ff;
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+.card:focus-visible {
+    outline: 2px solid #00f0ff;
+    outline-offset: 4px;
+}
+
+.copy-hex-value.is-copy-failed {
+    background: rgba(255, 70, 85, 0.28);
+    color: #ffffff;
+}
+
+/* ==============================================
+   REDUCED MOTION
+   21 animation vô hạn là vấn đề với người bị say chuyển động (WCAG 2.2.2).
+   Giao diện, màu, layout không đổi một pixel — chỉ dừng thứ đang tự chạy.
+   Người không bật tuỳ chọn này sẽ thấy trang y như cũ.
+   ============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Những layer chỉ tồn tại để chuyển động thì tắt hẳn, vì đứng yên chúng
+       chỉ còn là vệt sáng vô nghĩa nằm đè lên nội dung. */
+    .bg-particles,
+    .speed-lines,
+    .nvidia-scanline,
+    .shimmer-layer,
+    .rotate-layer {
+        display: none;
+    }
+
+    /* Card phải hiện, không phụ thuộc animation reveal nữa. */
+    html.js .card:not(.in-view) {
+        opacity: 1;
+        transform: none;
+    }
+
+    #cinematic-intro {
+        display: none;
+    }
 }
