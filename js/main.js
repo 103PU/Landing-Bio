@@ -47,6 +47,22 @@ function playIntro() {
 // Gọi intro
 playIntro();
 
+// Browsers may block audible autoplay until the first user gesture. Keep the
+// fallback invisible and retry playback without adding a player control.
+const bgVideoPlayer = document.getElementById('bg-video-player');
+const bgAudioPlayer = document.getElementById('bg-audio-player');
+bgVideoPlayer?.play().catch(() => {});
+bgAudioPlayer?.play().catch(() => {});
+
+const resumeBackgroundAudio = () => {
+    bgVideoPlayer?.play().catch(() => {});
+    bgAudioPlayer?.play().catch(() => {});
+};
+
+['pointerdown', 'keydown', 'touchstart'].forEach((eventName) => {
+    window.addEventListener(eventName, resumeBackgroundAudio, { once: true, passive: true });
+});
+
 
 // --- 2. (đã bỏ) LOCAL VIDEO CONTROL ---
 // <video id="bg-video-player"> không có src và không có <source> nào, nên thanh

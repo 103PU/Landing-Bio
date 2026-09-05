@@ -56,6 +56,16 @@
         <button type="button" id="intro-skip" class="intro-skip">SKIP &rsaquo;</button>
     </div>
 
+    <div class="bg-video" aria-hidden="true">
+        <video id="bg-video-player" autoplay muted loop playsinline preload="metadata" poster="./assets/avatar.jpg">
+            <source src="./assets/background.webm" type="video/webm">
+            <source src="./assets/background.mp4" type="video/mp4">
+        </video>
+    </div>
+    <audio id="bg-audio-player" autoplay loop preload="metadata">
+        <source src="./assets/chill.mp3" type="audio/mpeg">
+        <source src="./assets/background.mp4" type="video/mp4">
+    </audio>
     <div class="bg-overlay"></div>
     <div class="bg-text-effect">103_PU</div>
     <div class="bg-particles"></div>

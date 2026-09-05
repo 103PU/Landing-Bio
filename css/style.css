@@ -43,6 +43,37 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+.bg-video {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    overflow: hidden;
+    pointer-events: none;
+    background: #050505;
+}
+
+.bg-video video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 177.78vh;
+    height: 56.25vw;
+    min-width: 100vw;
+    min-height: 100vh;
+    transform: translate(-50%, -50%) scale(1.08);
+    border: 0;
+    opacity: 0.48;
+    filter: saturate(0.75) contrast(1.05);
+}
+
+#bg-audio-player {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
 
 .bg-overlay {
     position: fixed;
@@ -50,7 +81,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.78);
     /* Lớp phủ tối giúp text rõ hơn */
     z-index: -4;
     pointer-events: none;
