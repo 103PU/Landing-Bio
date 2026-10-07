@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -71,6 +71,9 @@
     <div class="bg-particles"></div>
     <div class="bg-gradient"></div>
 
+    <!-- 3D Mascot Interactive WebGL Canvas -->
+    <canvas id="bg-3d-canvas" class="bg-3d-canvas" aria-hidden="true"></canvas>
+
     <main class="main-wrapper">
         <div class="bento-grid">
 
@@ -84,6 +87,11 @@
                     <div class="profile-info">
                         <h1 class="glitch-text" data-text="103_PU">103_PU</h1>
                         <p class="profile-tag">Gaming Creator & Streamer</p>
+                        <div class="mascot-status-tag" id="mascot-status-tag" onclick="if(window.pulse3DMascot) window.pulse3DMascot()">
+                            <span class="pulse-dot"></span>
+                            <span class="status-txt">3D GUARDIAN SYNCED</span>
+                            <span class="action-hint">CLICK TO PING</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -345,6 +353,7 @@
     })();
     </script>
 
+    <script type="module" src="./js/bg-3d.js"></script>
     <script src="./js/main.js"></script>
 </body>
 </html>
