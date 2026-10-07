@@ -45,70 +45,37 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
 
-    // --- 2. CYBER LIGHTING (Valorant / Cyberpunk aesthetic) ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
+    // --- 2. LIGHTING (Studio setup: natural colors, no cyan flooding) ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
     scene.add(ambientLight);
 
-    // Key Light: Neon Cyan
-    const cyanLight = new THREE.DirectionalLight(0x00f5ff, 3.8);
-    cyanLight.position.set(4, 3, 2.5);
-    scene.add(cyanLight);
+    // Key Light: Neutral White
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    keyLight.position.set(3, 4, 3.5);
+    scene.add(keyLight);
 
-    // Rim Light: Neon Violet / Magenta
-    const purpleLight = new THREE.DirectionalLight(0xa855f7, 3.5);
-    purpleLight.position.set(-4, -2, -1);
-    scene.add(purpleLight);
+    // Soft Fill Light
+    const fillLight = new THREE.DirectionalLight(0xddeeff, 0.9);
+    fillLight.position.set(-3, 1, 2);
+    scene.add(fillLight);
 
-    // Under-glow: Valorant Red Accent
-    const accentLight = new THREE.PointLight(0xff4655, 2.4, 9, 2);
-    accentLight.position.set(0, -3.2, 1.8);
-    scene.add(accentLight);
+    // Soft Rim Light from back
+    const rimLight = new THREE.DirectionalLight(0xaaccff, 0.7);
+    rimLight.position.set(0, -2, -2);
+    scene.add(rimLight);
 
-    // Interactive Cursor Follow Light
-    const cursorLight = new THREE.PointLight(0x00ffff, 2.5, 7.5, 2);
+    // Soft neutral cursor follow light
+    const cursorLight = new THREE.PointLight(0xffffff, 0.8, 8, 2);
     cursorLight.position.set(0, 0, 2.5);
     scene.add(cursorLight);
 
-    // --- 3. MASCOT CONTAINER & HUD RINGS ---
+    // --- 3. MASCOT CONTAINER ---
     const mascotGroup = new THREE.Group();
     scene.add(mascotGroup);
 
     let targetScale = 1.0;
     let currentScale = 0.05;
     mascotGroup.scale.setScalar(currentScale);
-
-    // Holographic Tech Ring 1 (Inner Cyan Ring)
-    const ringGeo1 = new THREE.TorusGeometry(1.85, 0.012, 16, 96);
-    const ringMat1 = new THREE.MeshBasicMaterial({
-        color: 0x00f0ff,
-        transparent: true,
-        opacity: 0.38
-    });
-    const ringMesh1 = new THREE.Mesh(ringGeo1, ringMat1);
-    ringMesh1.rotation.x = Math.PI / 2.6;
-    mascotGroup.add(ringMesh1);
-
-    // Holographic Tech Ring 2 (Outer Accent Ring)
-    const ringGeo2 = new THREE.TorusGeometry(2.1, 0.008, 16, 64);
-    const ringMat2 = new THREE.MeshBasicMaterial({
-        color: 0xa855f7,
-        transparent: true,
-        opacity: 0.28
-    });
-    const ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
-    ringMesh2.rotation.x = -Math.PI / 2.8;
-    mascotGroup.add(ringMesh2);
-
-    // Tech HUD Crosshair ticks
-    const tickGeo = new THREE.BoxGeometry(0.12, 0.02, 0.02);
-    const tickMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6 });
-    for (let i = 0; i < 4; i++) {
-        const tick = new THREE.Mesh(tickGeo, tickMat);
-        const angle = (i * Math.PI) / 2;
-        tick.position.set(Math.cos(angle) * 1.85, 0, Math.sin(angle) * 1.85);
-        tick.rotation.y = -angle;
-        ringMesh1.add(tick);
-    }
 
     // --- 4. FLOATING CYBER EMBER PARTICLES ---
     const particleCount = 140;
@@ -295,7 +262,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         mouseNormY = (e.clientY / window.innerHeight - 0.5) * 2;
 
         targetRotY = mouseNormX * 0.45;
-        targetRotX = -mouseNormY * 0.35;
+        targetRotX = mouseNormY * 0.35; // Hướng nhìn đồng pha: chuột lên -> ngước lên, chuột xuống -> nhìn xuống
         targetRotZ = -mouseNormX * 0.08;
 
         cursorLight.position.x = mouseNormX * 3.5;
@@ -311,7 +278,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
             const gammaNorm = Math.min(Math.max(e.gamma / 45, -1), 1);
             const betaNorm = Math.min(Math.max((e.beta - 45) / 45, -1), 1);
             targetRotY = gammaNorm * 0.5;
-            targetRotX = -betaNorm * 0.35;
+            targetRotX = betaNorm * 0.35;
         }, { passive: true });
     }
 
@@ -387,10 +354,6 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         const isMobile = window.innerWidth < 768;
         const basePosY = isMobile ? 0.35 : 0.05;
         mascotGroup.position.y = basePosY + Math.sin(time * 1.5) * 0.07;
-
-        // Spin Holographic Rings
-        ringMesh1.rotation.z = time * 0.35;
-        ringMesh2.rotation.z = -time * 0.25;
 
         // Drift Ember Particles
         particles.rotation.y = time * 0.06;
