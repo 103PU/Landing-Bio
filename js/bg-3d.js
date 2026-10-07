@@ -1,14 +1,14 @@
 // ==========================================================================
-// 103_PU BIO — INTERACTIVE 3D MASCOT SYSTEM (Three.js WebGL)
-// High-performance, responsive 3D background mascot with cursor tracking,
-// dynamic cyber lighting, holographic HUD, and touch/gyroscope physics.
-// ponytail: không dùng heavy bloom post-processing để bảo đảm 60FPS trên mobile.
+// 103_PU BIO — 3D MASCOT INTEGRATION ENGINE (Three.js WebGL)
+// Built to support Blender GLB models: auto-centering, auto-scaling,
+// Skeletal AnimationMixer, ACES Tone Mapping, cursor tracking, and mobile gyro.
+// ponytail: không dùng UnrealBloom để bảo toàn 60FPS mượt mà trên thiết bị di động.
 // ==========================================================================
 
 import * as THREE from './libs/three.module.js';
 import { GLTFLoader } from './libs/GLTFLoader.js';
 
-(function init3DMascot() {
+(function init3DMascotEngine() {
     const canvas = document.getElementById('bg-3d-canvas');
     if (!canvas) return;
 
@@ -42,28 +42,30 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
 
     // --- 2. CYBER LIGHTING (Valorant / Cyberpunk aesthetic) ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
     scene.add(ambientLight);
 
     // Key Light: Neon Cyan
-    const cyanLight = new THREE.DirectionalLight(0x00f5ff, 3.6);
+    const cyanLight = new THREE.DirectionalLight(0x00f5ff, 3.8);
     cyanLight.position.set(4, 3, 2.5);
     scene.add(cyanLight);
 
     // Rim Light: Neon Violet / Magenta
-    const purpleLight = new THREE.DirectionalLight(0xa855f7, 3.4);
+    const purpleLight = new THREE.DirectionalLight(0xa855f7, 3.5);
     purpleLight.position.set(-4, -2, -1);
     scene.add(purpleLight);
 
-    // Under-glow: Valorant Red / Orange Accent
-    const accentLight = new THREE.PointLight(0xff4655, 2.5, 9, 2);
+    // Under-glow: Valorant Red Accent
+    const accentLight = new THREE.PointLight(0xff4655, 2.4, 9, 2);
     accentLight.position.set(0, -3.2, 1.8);
     scene.add(accentLight);
 
-    // Interactive Cursor Follow Light (shifts in 3D space with mouse)
-    const cursorLight = new THREE.PointLight(0x00ffff, 2.2, 7, 2);
+    // Interactive Cursor Follow Light
+    const cursorLight = new THREE.PointLight(0x00ffff, 2.5, 7.5, 2);
     cursorLight.position.set(0, 0, 2.5);
     scene.add(cursorLight);
 
@@ -71,7 +73,6 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     const mascotGroup = new THREE.Group();
     scene.add(mascotGroup);
 
-    // Initial scale starts at 0 for entrance animation
     let targetScale = 1.0;
     let currentScale = 0.05;
     mascotGroup.scale.setScalar(currentScale);
@@ -87,7 +88,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     ringMesh1.rotation.x = Math.PI / 2.6;
     mascotGroup.add(ringMesh1);
 
-    // Holographic Tech Ring 2 (Outer Segmented Accent Ring)
+    // Holographic Tech Ring 2 (Outer Accent Ring)
     const ringGeo2 = new THREE.TorusGeometry(2.1, 0.008, 16, 64);
     const ringMat2 = new THREE.MeshBasicMaterial({
         color: 0xa855f7,
@@ -98,7 +99,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     ringMesh2.rotation.x = -Math.PI / 2.8;
     mascotGroup.add(ringMesh2);
 
-    // Tech HUD Crosshair ticks (4 points)
+    // Tech HUD Crosshair ticks
     const tickGeo = new THREE.BoxGeometry(0.12, 0.02, 0.02);
     const tickMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6 });
     for (let i = 0; i < 4; i++) {
@@ -148,7 +149,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // --- 5. CLICK / TAP SHOCKWAVE SYSTEM ---
+    // --- 5. CLICK SHOCKWAVE EFFECT ---
     const shockwaveGeo = new THREE.RingGeometry(0.1, 0.16, 48);
     const shockwaveMat = new THREE.MeshBasicMaterial({
         color: 0x00f5ff,
@@ -162,51 +163,76 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     let shockwaveActive = false;
     let shockwaveScale = 0.1;
     let shockwaveOpacity = 0.0;
+    let nodOffset = 0;
+    let nodVelocity = 0;
 
     const triggerShockwave = () => {
         shockwaveActive = true;
         shockwaveScale = 0.2;
         shockwaveOpacity = 0.85;
-        // Head nod recoil
         nodVelocity = -0.14;
     };
 
-    // --- 6. LOAD MODEL WITH BULLETPROOF FALLBACK ---
-    let modelLoaded = false;
+    // --- 6. MODEL PIPELINE (Auto-Blender Compatibility) ---
+    let mixer = null;
+    let headBone = null;
+    let currentModelObject = null;
 
-    const setupMascotGeometry = (obj) => {
-        // Center pivot
+    const setupMascotGeometry = (obj, animations = []) => {
+        if (currentModelObject) {
+            mascotGroup.remove(currentModelObject);
+        }
+
+        currentModelObject = obj;
+
+        // Auto-center pivot to (0, 0, 0)
         const box = new THREE.Box3().setFromObject(obj);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         obj.position.sub(center);
 
-        // Normalize size to ~2.6 units
+        // Auto-normalize scale for arbitrary Blender exports
         const maxDim = Math.max(size.x, size.y, size.z);
+        const isMobile = window.innerWidth < 768;
+        const targetDim = isMobile ? 2.5 : 2.85;
         if (maxDim > 0) {
-            const scaleFactor = 2.6 / maxDim;
+            const scaleFactor = targetDim / maxDim;
             obj.scale.multiplyScalar(scaleFactor);
         }
 
+        // Search for head/neck bone if model is rigged
+        headBone = null;
         obj.traverse((child) => {
+            if (child.isBone && /head|neck/i.test(child.name)) {
+                if (!headBone) headBone = child;
+            }
             if (child.isMesh) {
-                child.material.side = THREE.DoubleSide;
-                child.material.roughness = 0.55;
-                child.material.metalness = 0.15;
+                child.castShadow = false;
+                child.receiveShadow = false;
+                if (child.material) {
+                    if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
+                    if (child.material.emissiveMap) child.material.emissiveMap.colorSpace = THREE.SRGBColorSpace;
+                }
             }
         });
 
+        // Initialize AnimationMixer if Blender model includes animation tracks
+        if (animations && animations.length > 0) {
+            mixer = new THREE.AnimationMixer(obj);
+            const clip = animations.find(c => /idle|float|loop/i.test(c.name)) || animations[0];
+            const action = mixer.clipAction(clip);
+            action.play();
+        }
+
         mascotGroup.add(obj);
-        modelLoaded = true;
     };
 
-    // Fallback: 3D Relief Mesh using generated maps
+    // Fallback: 3D Relief Mesh
     const setupFallbackDepthMesh = () => {
         const texLoader = new THREE.TextureLoader();
         const colorTex = texLoader.load('./assets/husky_cutout.png');
         const depthTex = texLoader.load('./assets/husky_depth.png');
         const normalTex = texLoader.load('./assets/husky_normal.png');
-
         colorTex.colorSpace = THREE.SRGBColorSpace;
 
         const planeGeo = new THREE.PlaneGeometry(2.7, 2.7, 128, 128);
@@ -224,42 +250,54 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
         const fallbackMesh = new THREE.Mesh(planeGeo, planeMat);
         fallbackMesh.position.set(0, 0, 0);
-        mascotGroup.add(fallbackMesh);
-        modelLoaded = true;
+        setupMascotGeometry(fallbackMesh);
     };
 
-    // Try GLTF first, then fallback
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.load(
+    // Candidates in priority order (Blender model can be model.glb, husky.glb, or mascot.glb)
+    const MODEL_CANDIDATES = [
+        './assets/model.glb',
         './assets/husky.glb',
-        (gltf) => {
-            setupMascotGeometry(gltf.scene);
-        },
-        undefined,
-        (err) => {
-            console.warn('GLB load error, using 3D depth mesh:', err);
-            setupFallbackDepthMesh();
-        }
-    );
+        './assets/mascot.glb'
+    ];
 
-    // --- 7. PHYSICS, CURSOR TRACKING, LERP ---
+    const gltfLoader = new GLTFLoader();
+
+    const loadNextCandidate = (index) => {
+        if (index >= MODEL_CANDIDATES.length) {
+            setupFallbackDepthMesh();
+            return;
+        }
+
+        const candidateUrl = MODEL_CANDIDATES[index];
+        gltfLoader.load(
+            candidateUrl,
+            (gltf) => {
+                setupMascotGeometry(gltf.scene, gltf.animations);
+            },
+            undefined,
+            () => {
+                loadNextCandidate(index + 1);
+            }
+        );
+    };
+
+    loadNextCandidate(0);
+
+    // --- 7. PHYSICS & CURSOR TRACKING ---
     let mouseNormX = 0;
     let mouseNormY = 0;
     let targetRotY = 0;
     let targetRotX = 0;
     let targetRotZ = 0;
-    let nodOffset = 0;
-    let nodVelocity = 0;
 
     const onPointerMove = (e) => {
         mouseNormX = (e.clientX / window.innerWidth - 0.5) * 2;
         mouseNormY = (e.clientY / window.innerHeight - 0.5) * 2;
 
-        targetRotY = mouseNormX * 0.45;  // Yaw (left/right)
-        targetRotX = -mouseNormY * 0.35; // Pitch (up/down)
-        targetRotZ = -mouseNormX * 0.08; // Subtle banking roll
+        targetRotY = mouseNormX * 0.45;
+        targetRotX = -mouseNormY * 0.35;
+        targetRotZ = -mouseNormX * 0.08;
 
-        // Position dynamic cursor light
         cursorLight.position.x = mouseNormX * 3.5;
         cursorLight.position.y = -mouseNormY * 3.0;
     };
@@ -277,9 +315,8 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         }, { passive: true });
     }
 
-    // Trigger shockwave and nod on click
-    window.addEventListener('pointerdown', (e) => {
-        // If clicking normal interactive elements, still trigger subtle pulse
+    // Trigger shockwave on click
+    window.addEventListener('pointerdown', () => {
         triggerShockwave();
     }, { passive: true });
 
@@ -294,7 +331,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         });
     });
 
-    // --- 8. RESIZE & VISIBILITY HANDLING ---
+    // --- 8. RESIZE & VISIBILITY ---
     const onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -309,7 +346,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         isVisible = !document.hidden;
     });
 
-    // --- 9. ANIMATION LOOP ---
+    // --- 9. RENDER LOOP ---
     const clock = new THREE.Clock();
 
     const animate = () => {
@@ -318,6 +355,11 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
         const delta = clock.getDelta();
         const time = clock.getElapsedTime();
+
+        // Update Blender animation mixer
+        if (mixer) {
+            mixer.update(delta);
+        }
 
         // Smooth scale entrance
         if (currentScale < targetScale) {
@@ -329,6 +371,12 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         mascotGroup.rotation.y += (targetRotY - mascotGroup.rotation.y) * 0.055;
         mascotGroup.rotation.x += (targetRotX + nodOffset - mascotGroup.rotation.x) * 0.055;
         mascotGroup.rotation.z += (targetRotZ - mascotGroup.rotation.z) * 0.055;
+
+        // If rigged head bone exists, apply fine gaze tracking
+        if (headBone) {
+            headBone.rotation.y += (targetRotY * 0.6 - headBone.rotation.y) * 0.1;
+            headBone.rotation.x += (targetRotX * 0.6 - headBone.rotation.x) * 0.1;
+        }
 
         // Spring nod physics
         nodVelocity += (-nodOffset * 18.0) * delta;
@@ -364,6 +412,6 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
     animate();
 
-    // Export pulse trigger for external HUD button
+    // Export pulse function
     window.pulse3DMascot = triggerShockwave;
 })();

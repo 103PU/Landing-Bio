@@ -51,10 +51,14 @@ playIntro();
 // fallback invisible and retry playback without adding a player control.
 const bgVideoPlayer = document.getElementById('bg-video-player');
 const bgAudioPlayer = document.getElementById('bg-audio-player');
+if (bgAudioPlayer) {
+    bgAudioPlayer.volume = 0.18; // Giảm âm lượng nền dịu nhẹ (18%)
+}
 bgVideoPlayer?.play().catch(() => {});
 bgAudioPlayer?.play().catch(() => {});
 
 const resumeBackgroundAudio = () => {
+    if (bgAudioPlayer) bgAudioPlayer.volume = 0.18;
     bgVideoPlayer?.play().catch(() => {});
     bgAudioPlayer?.play().catch(() => {});
 };
