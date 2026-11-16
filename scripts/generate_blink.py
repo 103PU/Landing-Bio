@@ -33,39 +33,60 @@ def safe_fallback(reason: str):
 
 def compute_confidence(img: Image.Image) -> tuple[float, dict]:
     """
-    Evaluates image format, eye regions, luminance and facial symmetry.
+    Evaluates image format, alpha channel, eye region dynamic range and symmetry.
     Returns overall confidence score [0.0 - 1.0] and metric details.
     """
     metrics = {
         "format_ok": False,
+        "alpha_ok": False,
         "left_eye_contrast_ok": False,
         "right_eye_contrast_ok": False,
-        "symmetry_ok": False,
-        "alpha_ok": False
+        "symmetry_ok": False
     }
 
     width, height = img.size
     if width == 1043 and height == 1043 and img.mode == "RGBA":
         metrics["format_ok"] = True
 
-    # Check alpha channel presence
-    alpha = img.split()[3]
-    bbox = alpha.getbbox()
-    if bbox and (bbox[2] - bbox[0] > 800) and (bbox[3] - bbox[1] > 800):
-        metrics["alpha_ok"] = True
+    # Check alpha channel presence and minimum non-transparent pixel count
+    try:
+        alpha = img.split()[3]
+        bbox = alpha.getbbox()
+        alpha_arr = np.array(alpha)
+        non_transparent_count = int(np.count_nonzero(alpha_arr > 50))
+        # Genuine husky cutout has > 700,000 non-transparent pixels and bbox > 800x800
+        if bbox and (bbox[2] - bbox[0] > 800) and (bbox[3] - bbox[1] > 800) and non_transparent_count >= 200000:
+            metrics["alpha_ok"] = True
+    except Exception:
+        metrics["alpha_ok"] = False
 
     # Left eye bounding box: X=370..415, Y=462..486
     # Right eye bounding box: X=610..655, Y=462..486
-    left_crop = img.crop((370, 462, 415, 486)).convert("L")
-    right_crop = img.crop((610, 462, 655, 486)).convert("L")
+    try:
+        left_crop = img.crop((370, 462, 415, 486)).convert("L")
+        right_crop = img.crop((610, 462, 655, 486)).convert("L")
 
-    left_min = int(np.array(left_crop).min())
-    right_min = int(np.array(right_crop).min())
+        left_arr = np.array(left_crop)
+        right_arr = np.array(right_crop)
 
-    if left_min < 50:
-        metrics["left_eye_contrast_ok"] = True
-    if right_min < 50:
-        metrics["right_eye_contrast_ok"] = True
+        left_min = int(left_arr.min())
+        left_max = int(left_arr.max())
+        left_dyn = left_max - left_min
+        left_mean = float(left_arr.mean())
+
+        right_min = int(right_arr.min())
+        right_max = int(right_arr.max())
+        right_dyn = right_max - right_min
+        right_mean = float(right_arr.mean())
+
+        # Genuine eyes have dark pupil (min < 50), dynamic range >= 35, and reasonable mean brightness
+        if left_min < 50 and left_dyn >= 35 and (20.0 <= left_mean <= 220.0):
+            metrics["left_eye_contrast_ok"] = True
+        if right_min < 50 and right_dyn >= 35 and (20.0 <= right_mean <= 220.0):
+            metrics["right_eye_contrast_ok"] = True
+    except Exception:
+        metrics["left_eye_contrast_ok"] = False
+        metrics["right_eye_contrast_ok"] = False
 
     # Check symmetry of centers (392, 474) and (632, 474) about face center X=521
     left_center_x = 392.5
@@ -75,17 +96,19 @@ def compute_confidence(img: Image.Image) -> tuple[float, dict]:
         metrics["symmetry_ok"] = True
 
     # Score calculation
+    # Weights: format (0.20) + alpha (0.30) + left eye (0.25) + right eye (0.25) = 1.00
+    # Blank transparent: format(0.20) = 0.20 < 0.75 -> fallback
+    # Solid black: format(0.20) + alpha(0.30) = 0.50 < 0.75 -> fallback
+    # Solid white: format(0.20) + alpha(0.30) = 0.50 < 0.75 -> fallback
     score = 0.0
     if metrics["format_ok"]:
-        score += 0.30
-    if metrics["alpha_ok"]:
         score += 0.20
+    if metrics["alpha_ok"]:
+        score += 0.30
     if metrics["left_eye_contrast_ok"]:
         score += 0.25
     if metrics["right_eye_contrast_ok"]:
         score += 0.25
-    if metrics["symmetry_ok"]:
-        score += 0.00  # symmetry was bonus, but base adds up to 1.0
 
     return score, metrics
 

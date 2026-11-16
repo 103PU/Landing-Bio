@@ -305,6 +305,9 @@ function initSpeechBubble() {
         speak(quote, 3500);
     });
 
+    // Auto-dismiss bubble on scroll so cards and content are never occluded
+    window.addEventListener('scroll', hide, { passive: true });
+
     window.triggerMascotSpeech = speak;
 }
 

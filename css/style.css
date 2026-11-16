@@ -1501,17 +1501,38 @@ summary:focus-visible,
 }
 
 @media (max-width: 767px) {
+    body {
+        padding-top: 100px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .audio-toggle-btn {
+        top: 16px;
+        right: 16px;
+    }
+
     .mascot-speech-bubble {
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-10px) scale(0.95);
-        width: calc(100% - 40px);
-        max-width: 340px;
+        top: 16px;
+        left: 16px;
+        right: auto;
+        transform: translateY(-8px) scale(0.95);
+        width: calc(100% - 84px);
+        max-width: 250px;
+        padding: 9px 12px;
         border-color: rgba(0, 242, 234, 0.5);
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 242, 234, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 18px rgba(0, 242, 234, 0.25);
     }
     .mascot-speech-bubble.is-visible {
-        transform: translateX(-50%) translateY(0) scale(1);
+        transform: translateY(0) scale(1);
+    }
+    .mascot-speech-bubble .bubble-header {
+        margin-bottom: 4px;
+        font-size: 0.7rem;
+    }
+    .mascot-speech-bubble .bubble-text {
+        font-size: 0.8rem;
+        line-height: 1.25;
     }
     .mascot-speech-bubble .bubble-arrow {
         display: none;

@@ -233,16 +233,13 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
                     }
                 }
 
-                // Polish material: tighten condition and add subtle emissive
+                // Polish material: ensure standard material with subtle emissive
                 if (!child.material || !child.material.map) {
                     child.material = new THREE.MeshStandardMaterial({
                         map: mascotColorTex,
                         normalMap: mascotNormalTex,
                         roughness: 0.52,
                         metalness: 0.1,
-                        emissive: new THREE.Color(0x1a2436),
-                        emissiveMap: mascotColorTex,
-                        emissiveIntensity: 0.2,
                         transparent: true,
                         alphaTest: 0.05,
                         side: THREE.DoubleSide
@@ -250,6 +247,10 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
                 } else {
                     if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
                 }
+                child.material.emissive = new THREE.Color(0x1a2436);
+                child.material.emissiveMap = mascotColorTex;
+                child.material.emissiveIntensity = 0.2;
+                child.material.needsUpdate = true;
             }
         });
 
@@ -370,7 +371,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
     // A. Double-Click -> Dance 2.0s
     window.addEventListener('dblclick', (e) => {
-        if (e.target.closest('a, button, input')) return;
+        if (e.target?.closest?.('a, button, input')) return;
         if (!isPointerOverMascot(e.clientX, e.clientY)) return;
         if (isReducedMotion) return;
         isDancing = true;
@@ -382,7 +383,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         // Retain existing shockwave and nod impulse on all clicks
         triggerShockwave();
 
-        if (e.target.closest('a, button, input')) return;
+        if (e.target?.closest?.('a, button, input')) return;
         const hitMascot = isPointerOverMascot(e.clientX, e.clientY);
         if (!hitMascot) return;
 
@@ -730,6 +731,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         startLoop();
     }
 
-    // Export pulse function
+    // Export pulse function & mascot mesh accessor for inspection
     window.pulse3DMascot = triggerShockwave;
+    window.getMascotMesh = () => mascotMesh;
 })();
