@@ -6,6 +6,7 @@ IMG_*.jpg
 
 # Anh chup + log do kiem (CDP audit), chi dung o may local
 .audit-shots/
+preview_*.png
 
 # OS / editor
 Thumbs.db

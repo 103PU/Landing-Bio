@@ -1367,8 +1367,9 @@ summary:focus-visible,
     .speed-lines,
     .nvidia-scanline,
     .shimmer-layer,
-    .rotate-layer {
-        display: none;
+    .rotate-layer,
+    .bg-3d-canvas {
+        display: none !important;
     }
 
     /* Card phải hiện, không phụ thuộc animation reveal nữa. */

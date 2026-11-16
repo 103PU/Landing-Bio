@@ -134,6 +134,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     let nodVelocity = 0;
 
     const triggerShockwave = () => {
+        if (isReducedMotion) return;
         shockwaveActive = true;
         shockwaveScale = 0.2;
         shockwaveOpacity = 0.85;
@@ -141,6 +142,11 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     };
 
     // --- 6. MODEL PIPELINE (Auto-Blender Compatibility) ---
+    const texLoader = new THREE.TextureLoader();
+    const mascotColorTex = texLoader.load('./assets/husky_cutout.png');
+    mascotColorTex.colorSpace = THREE.SRGBColorSpace;
+    const mascotNormalTex = texLoader.load('./assets/husky_normal.png');
+
     let mixer = null;
     let headBone = null;
     let currentModelObject = null;
@@ -176,9 +182,42 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
             if (child.isMesh) {
                 child.castShadow = false;
                 child.receiveShadow = false;
-                if (child.material) {
+
+                const geom = child.geometry;
+                if (geom) {
+                    if (!geom.attributes.uv) {
+                        geom.computeBoundingBox();
+                        const bbox = geom.boundingBox;
+                        const pos = geom.attributes.position;
+                        const count = pos.count;
+                        const uvs = new Float32Array(count * 2);
+                        const minX = bbox.min.x, maxX = bbox.max.x;
+                        const minY = bbox.min.y, maxY = bbox.max.y;
+                        const rangeX = maxX - minX || 1;
+                        const rangeY = maxY - minY || 1;
+                        for (let i = 0; i < count; i++) {
+                            uvs[i * 2] = (pos.getX(i) - minX) / rangeX;
+                            uvs[i * 2 + 1] = (pos.getY(i) - minY) / rangeY;
+                        }
+                        geom.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+                    }
+                    if (!geom.attributes.normal) {
+                        geom.computeVertexNormals();
+                    }
+                }
+
+                if (!child.material || !child.material.displacementMap) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: mascotColorTex,
+                        normalMap: mascotNormalTex,
+                        roughness: 0.55,
+                        metalness: 0.1,
+                        transparent: true,
+                        alphaTest: 0.05,
+                        side: THREE.DoubleSide
+                    });
+                } else {
                     if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
-                    if (child.material.emissiveMap) child.material.emissiveMap.colorSpace = THREE.SRGBColorSpace;
                 }
             }
         });
@@ -196,18 +235,14 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
     // Fallback: 3D Relief Mesh
     const setupFallbackDepthMesh = () => {
-        const texLoader = new THREE.TextureLoader();
-        const colorTex = texLoader.load('./assets/husky_cutout.png');
         const depthTex = texLoader.load('./assets/husky_depth.png');
-        const normalTex = texLoader.load('./assets/husky_normal.png');
-        colorTex.colorSpace = THREE.SRGBColorSpace;
 
         const planeGeo = new THREE.PlaneGeometry(2.7, 2.7, 128, 128);
         const planeMat = new THREE.MeshStandardMaterial({
-            map: colorTex,
+            map: mascotColorTex,
             displacementMap: depthTex,
             displacementScale: 0.75,
-            normalMap: normalTex,
+            normalMap: mascotNormalTex,
             roughness: 0.55,
             metalness: 0.15,
             transparent: true,
@@ -222,8 +257,8 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
     // Candidates in priority order (Blender model can be model.glb, husky.glb, or mascot.glb)
     const MODEL_CANDIDATES = [
-        './assets/model.glb',
         './assets/husky.glb',
+        './assets/model.glb',
         './assets/mascot.glb'
     ];
 
@@ -298,7 +333,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         });
     });
 
-    // --- 8. RESIZE & VISIBILITY ---
+    // --- 8. RESIZE, MOTION & VISIBILITY ---
     const onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -308,17 +343,72 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     };
     window.addEventListener('resize', onResize);
 
-    let isVisible = true;
+    const motionQuery = typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+    let isReducedMotion = motionQuery ? motionQuery.matches : false;
+    let isVisible = !document.hidden;
+    let animationFrameId = null;
+    let isRunning = false;
+
+    const stopLoop = () => {
+        isRunning = false;
+        if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+    };
+
+    const startLoop = () => {
+        if (isRunning || isReducedMotion || !isVisible) return;
+        isRunning = true;
+        clock.start();
+        animationFrameId = requestAnimationFrame(animate);
+    };
+
+    const updateMotionState = (reduced) => {
+        isReducedMotion = reduced;
+        if (isReducedMotion) {
+            canvas.style.display = 'none';
+            stopLoop();
+        } else {
+            canvas.style.display = '';
+            startLoop();
+        }
+    };
+
+    if (motionQuery) {
+        const handleMotionChange = (e) => updateMotionState(e.matches);
+        if (typeof motionQuery.addEventListener === 'function') {
+            motionQuery.addEventListener('change', handleMotionChange);
+        } else if (typeof motionQuery.addListener === 'function') {
+            motionQuery.addListener(handleMotionChange);
+        }
+    }
+
     document.addEventListener('visibilitychange', () => {
         isVisible = !document.hidden;
+        if (isVisible && !isReducedMotion) {
+            startLoop();
+        } else {
+            stopLoop();
+        }
     });
+
+    if (isReducedMotion) {
+        canvas.style.display = 'none';
+    }
 
     // --- 9. RENDER LOOP ---
     const clock = new THREE.Clock();
 
     const animate = () => {
-        requestAnimationFrame(animate);
-        if (!isVisible) return;
+        if (!isRunning || isReducedMotion || !isVisible) {
+            isRunning = false;
+            animationFrameId = null;
+            return;
+        }
+        animationFrameId = requestAnimationFrame(animate);
 
         const delta = clock.getDelta();
         const time = clock.getElapsedTime();
@@ -373,7 +463,9 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         renderer.render(scene, camera);
     };
 
-    animate();
+    if (!isReducedMotion) {
+        startLoop();
+    }
 
     // Export pulse function
     window.pulse3DMascot = triggerShockwave;
