@@ -1,7 +1,9 @@
 // ==========================================================================
 // 103_PU BIO — 3D MASCOT INTEGRATION ENGINE (Three.js WebGL)
-// Built to support Blender GLB models: auto-centering, auto-scaling,
-// Skeletal AnimationMixer, ACES Tone Mapping, cursor tracking, and mobile gyro.
+// Supports Blender GLB models: auto-centering, auto-scaling,
+// Skeletal AnimationMixer, ACES Tone Mapping, cursor tracking, mobile gyro,
+// Procedural Emotes (Dance, Peek, Idle Walk, 360 Spin + Confetti),
+// Planar UV calibration, Texture-Swap Eye Blink, and Rim Lighting Polish.
 // ponytail: không dùng UnrealBloom để bảo toàn 60FPS mượt mà trên thiết bị di động.
 // ==========================================================================
 
@@ -45,7 +47,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
 
-    // --- 2. LIGHTING (Studio setup: natural colors, no cyan flooding) ---
+    // --- 2. LIGHTING (Studio setup: enhanced dual rim lighting to pop mascot from background) ---
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
     scene.add(ambientLight);
 
@@ -59,10 +61,15 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     fillLight.position.set(-3, 1, 2);
     scene.add(fillLight);
 
-    // Soft Rim Light from back
-    const rimLight = new THREE.DirectionalLight(0xaaccff, 0.7);
-    rimLight.position.set(0, -2, -2);
+    // Rim Light 1: Top-Back Cyan Rim Light
+    const rimLight = new THREE.DirectionalLight(0x00f5ff, 1.8);
+    rimLight.position.set(0, 3, -3);
     scene.add(rimLight);
+
+    // Rim Light 2: Side-Back Kick Purple Rim Light
+    const kickRimLight = new THREE.DirectionalLight(0xa855f7, 1.2);
+    kickRimLight.position.set(-3, 1, -2.5);
+    scene.add(kickRimLight);
 
     // Soft neutral cursor follow light
     const cursorLight = new THREE.PointLight(0xffffff, 0.8, 8, 2);
@@ -128,8 +135,10 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     shockwaveMesh.position.z = 0.5;
     mascotGroup.add(shockwaveMesh);
     let shockwaveActive = false;
-    let shockwaveScale = 0.1;
-    let shockwaveOpacity = 0.0;
+    let shockwaveScale = 0.2;
+    let shockwaveOpacity = 0.85;
+
+    // Physical nod spring
     let nodOffset = 0;
     let nodVelocity = 0;
 
@@ -141,15 +150,27 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         nodVelocity = -0.14;
     };
 
-    // --- 6. MODEL PIPELINE (Auto-Blender Compatibility) ---
+    // --- 6. TEXTURES & MASCOT GEOMETRY ---
     const texLoader = new THREE.TextureLoader();
     const mascotColorTex = texLoader.load('./assets/husky_cutout.png');
     mascotColorTex.colorSpace = THREE.SRGBColorSpace;
     const mascotNormalTex = texLoader.load('./assets/husky_normal.png');
 
+    // Preload blink texture with WebGL VRAM initialization
+    let mascotBlinkTex = null;
+    const blinkImg = new Image();
+    blinkImg.onload = () => {
+        mascotBlinkTex = texLoader.load('./assets/husky_cutout_blink.png', (tex) => {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            if (renderer) renderer.initTexture(tex);
+        });
+    };
+    blinkImg.src = './assets/husky_cutout_blink.png';
+
     let mixer = null;
     let headBone = null;
     let currentModelObject = null;
+    let mascotMesh = null;
 
     const setupMascotGeometry = (obj, animations = []) => {
         if (currentModelObject) {
@@ -157,6 +178,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         }
 
         currentModelObject = obj;
+        mascotMesh = null;
 
         // Auto-center pivot to (0, 0, 0)
         const box = new THREE.Box3().setFromObject(obj);
@@ -182,6 +204,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
             if (child.isMesh) {
                 child.castShadow = false;
                 child.receiveShadow = false;
+                if (!mascotMesh) mascotMesh = child;
 
                 const geom = child.geometry;
                 if (geom) {
@@ -195,9 +218,13 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
                         const minY = bbox.min.y, maxY = bbox.max.y;
                         const rangeX = maxX - minX || 1;
                         const rangeY = maxY - minY || 1;
+                        // Centered 1:1 Planar UV projection to eliminate asymmetric stretch
+                        const maxRange = Math.max(rangeX, rangeY);
+                        const offsetX = minX + (rangeX - maxRange) * 0.5;
+                        const offsetY = minY + (rangeY - maxRange) * 0.5;
                         for (let i = 0; i < count; i++) {
-                            uvs[i * 2] = (pos.getX(i) - minX) / rangeX;
-                            uvs[i * 2 + 1] = (pos.getY(i) - minY) / rangeY;
+                            uvs[i * 2] = (pos.getX(i) - offsetX) / maxRange;
+                            uvs[i * 2 + 1] = (pos.getY(i) - offsetY) / maxRange;
                         }
                         geom.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
                     }
@@ -206,12 +233,16 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
                     }
                 }
 
-                if (!child.material || !child.material.displacementMap) {
+                // Polish material: tighten condition and add subtle emissive
+                if (!child.material || !child.material.map) {
                     child.material = new THREE.MeshStandardMaterial({
                         map: mascotColorTex,
                         normalMap: mascotNormalTex,
-                        roughness: 0.55,
+                        roughness: 0.52,
                         metalness: 0.1,
+                        emissive: new THREE.Color(0x1a2436),
+                        emissiveMap: mascotColorTex,
+                        emissiveIntensity: 0.2,
                         transparent: true,
                         alphaTest: 0.05,
                         side: THREE.DoubleSide
@@ -243,49 +274,215 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
             displacementMap: depthTex,
             displacementScale: 0.75,
             normalMap: mascotNormalTex,
-            roughness: 0.55,
-            metalness: 0.15,
+            roughness: 0.52,
+            metalness: 0.1,
+            emissive: new THREE.Color(0x1a2436),
+            emissiveMap: mascotColorTex,
+            emissiveIntensity: 0.2,
             transparent: true,
-            alphaTest: 0.1,
+            alphaTest: 0.05,
             side: THREE.DoubleSide
         });
 
         const fallbackMesh = new THREE.Mesh(planeGeo, planeMat);
-        fallbackMesh.position.set(0, 0, 0);
+        fallbackMesh.position.z = 0;
+        mascotMesh = fallbackMesh;
         setupMascotGeometry(fallbackMesh);
     };
 
-    // Candidates in priority order (Blender model can be model.glb, husky.glb, or mascot.glb)
-    const MODEL_CANDIDATES = [
-        './assets/husky.glb',
-        './assets/model.glb',
-        './assets/mascot.glb'
-    ];
-
+    // Attempt loading husky.glb first, fallback to depth mesh
     const gltfLoader = new GLTFLoader();
-
-    const loadNextCandidate = (index) => {
-        if (index >= MODEL_CANDIDATES.length) {
+    gltfLoader.load(
+        './assets/husky.glb',
+        (gltf) => {
+            setupMascotGeometry(gltf.scene, gltf.animations);
+            canvas.style.opacity = '1';
+        },
+        undefined,
+        (err) => {
+            console.warn('[3D Mascot] GLB load failed, falling back to procedural depth mesh:', err);
             setupFallbackDepthMesh();
+            canvas.style.opacity = '1';
+        }
+    );
+
+    // --- 7. TEXTURE-SWAP EYE BLINK CONTROLLER ---
+    let blinkTimer = null;
+    let blinkRestoreTimer = null;
+
+    const scheduleNextBlink = () => {
+        if (blinkTimer) clearTimeout(blinkTimer);
+        const delay = 3000 + Math.random() * 2000; // 3 - 5 seconds
+        blinkTimer = setTimeout(() => {
+            if (!isVisible || isReducedMotion || !mascotBlinkTex || !mascotMesh || !mascotMesh.material) {
+                scheduleNextBlink();
+                return;
+            }
+            // Swap to blink texture for 120ms without setting needsUpdate to preserve 60FPS
+            mascotMesh.material.map = mascotBlinkTex;
+            blinkRestoreTimer = setTimeout(() => {
+                if (mascotMesh && mascotMesh.material) {
+                    mascotMesh.material.map = mascotColorTex;
+                }
+                scheduleNextBlink();
+            }, 120);
+        }, delay);
+    };
+    scheduleNextBlink();
+
+    // --- 8. PROCEDURAL EMOTES & INTERACTION SYSTEM ---
+    // Raycaster for hit-testing mascot
+    const raycaster = new THREE.Raycaster();
+    const pointerVec = new THREE.Vector2();
+
+    const isPointerOverMascot = (clientX, clientY) => {
+        if (!currentModelObject) return false;
+        pointerVec.x = (clientX / window.innerWidth) * 2 - 1;
+        pointerVec.y = -(clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointerVec, camera);
+        const hits = raycaster.intersectObject(currentModelObject, true);
+        return hits.length > 0;
+    };
+
+    // Emote State Variables
+    let danceStartTime = 0;
+    let isDancing = false;
+    let danceRotZ = 0;
+    let danceBounceY = 0;
+
+    let isPeeking = false;
+    let holdTimeout = null;
+    let holdStartX = 0, holdStartY = 0;
+    let peekRotZ = 0, peekRotX = 0, peekGazeY = 0, peekGazeX = 0;
+
+    let lastScrollTime = performance.now();
+    let isIdleLooking = false;
+    let nextIdleLookTime = 0;
+    let idleTargetRotY = 0, idleTargetRotX = 0;
+    let headShakeActive = false;
+    let headShakeStartTime = 0;
+    let headShakeOffset = 0;
+
+    let comboCount = 0;
+    let comboResetTimer = null;
+    let isSpinning360 = false;
+    let spinStartTime = 0;
+
+    // A. Double-Click -> Dance 2.0s
+    window.addEventListener('dblclick', (e) => {
+        if (e.target.closest('a, button, input')) return;
+        if (!isPointerOverMascot(e.clientX, e.clientY)) return;
+        if (isReducedMotion) return;
+        isDancing = true;
+        danceStartTime = performance.now();
+    });
+
+    // B. Hold 800ms -> Peek + 5-Click Combo 360 & Confetti
+    window.addEventListener('pointerdown', (e) => {
+        // Retain existing shockwave and nod impulse on all clicks
+        triggerShockwave();
+
+        if (e.target.closest('a, button, input')) return;
+        const hitMascot = isPointerOverMascot(e.clientX, e.clientY);
+        if (!hitMascot) return;
+
+        // Dispatch tap event for speech bubble & mobile mascot reactions
+        window.dispatchEvent(new CustomEvent('mascot:tap'));
+
+        // 5-Click Combo Counter
+        comboCount++;
+        clearTimeout(comboResetTimer);
+        comboResetTimer = setTimeout(() => { comboCount = 0; }, 900);
+
+        if (comboCount >= 5) {
+            comboCount = 0;
+            triggerEasterEgg360();
+            cancelPeek();
             return;
         }
 
-        const candidateUrl = MODEL_CANDIDATES[index];
-        gltfLoader.load(
-            candidateUrl,
-            (gltf) => {
-                setupMascotGeometry(gltf.scene, gltf.animations);
-            },
-            undefined,
-            () => {
-                loadNextCandidate(index + 1);
-            }
-        );
+        // Hold detection (800ms)
+        holdStartX = e.clientX;
+        holdStartY = e.clientY;
+        clearTimeout(holdTimeout);
+        holdTimeout = setTimeout(() => {
+            if (isReducedMotion || isDancing || isSpinning360) return;
+            isPeeking = true;
+            targetScale = 1.15;
+            peekRotZ = 0.22;
+            peekRotX = 0.12;
+            peekGazeY = 0.35;
+            peekGazeX = -0.15;
+        }, 800);
+    }, { passive: true });
+
+    const cancelPeek = () => {
+        clearTimeout(holdTimeout);
+        holdTimeout = null;
+        if (isPeeking) {
+            isPeeking = false;
+            targetScale = 1.0;
+            peekRotZ = 0;
+            peekRotX = 0;
+            peekGazeY = 0;
+            peekGazeX = 0;
+        }
     };
 
-    loadNextCandidate(0);
+    window.addEventListener('pointerup', cancelPeek, { passive: true });
+    window.addEventListener('pointercancel', cancelPeek, { passive: true });
+    window.addEventListener('pointermove', (e) => {
+        if (holdTimeout) {
+            if (Math.hypot(e.clientX - holdStartX, e.clientY - holdStartY) > 15) {
+                cancelPeek();
+            }
+        }
+    }, { passive: true });
 
-    // --- 7. PHYSICS & CURSOR TRACKING ---
+    // C. Scroll Idle 20s
+    window.addEventListener('scroll', () => {
+        lastScrollTime = performance.now();
+        if (isIdleLooking) {
+            isIdleLooking = false;
+            headShakeActive = false;
+            headShakeOffset = 0;
+        }
+    }, { passive: true });
+
+    // D. Easter Egg 360 Spin + Confetti
+    const triggerEasterEgg360 = () => {
+        if (isReducedMotion) return;
+        isSpinning360 = true;
+        spinStartTime = performance.now();
+
+        if (typeof window.confetti === 'function') {
+            window.confetti({
+                particleCount: 80,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#00f5ff', '#a855f7', '#ff4655', '#ffffff', '#ffd700'],
+                disableForReducedMotion: true
+            });
+            setTimeout(() => {
+                window.confetti({
+                    particleCount: 50,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0.2, y: 0.7 },
+                    colors: ['#00f5ff', '#a855f7', '#ffffff']
+                });
+                window.confetti({
+                    particleCount: 50,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 0.8, y: 0.7 },
+                    colors: ['#00f5ff', '#ff4655', '#ffd700']
+                });
+            }, 250);
+        }
+    };
+
+    // --- 9. MOUSE TRACKING & GYRO ---
     let mouseNormX = 0;
     let mouseNormY = 0;
     let targetRotY = 0;
@@ -297,7 +494,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         mouseNormY = (e.clientY / window.innerHeight - 0.5) * 2;
 
         targetRotY = mouseNormX * 0.45;
-        targetRotX = mouseNormY * 0.35; // Hướng nhìn đồng pha: chuột lên -> ngước lên, chuột xuống -> nhìn xuống
+        targetRotX = mouseNormY * 0.35;
         targetRotZ = -mouseNormX * 0.08;
 
         cursorLight.position.x = mouseNormX * 3.5;
@@ -317,23 +514,18 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         }, { passive: true });
     }
 
-    // Trigger shockwave on click
-    window.addEventListener('pointerdown', () => {
-        triggerShockwave();
-    }, { passive: true });
-
     // Card hover interaction
     const cards = document.querySelectorAll('.card');
     cards.forEach((card) => {
         card.addEventListener('mouseenter', () => {
-            targetScale = 1.05;
+            if (!isPeeking) targetScale = 1.05;
         });
         card.addEventListener('mouseleave', () => {
-            targetScale = 1.0;
+            if (!isPeeking) targetScale = 1.0;
         });
     });
 
-    // --- 8. RESIZE, MOTION & VISIBILITY ---
+    // --- 10. RESIZE, MOTION & VISIBILITY ---
     const onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -357,6 +549,8 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
         }
+        if (blinkTimer) clearTimeout(blinkTimer);
+        if (blinkRestoreTimer) clearTimeout(blinkRestoreTimer);
     };
 
     const startLoop = () => {
@@ -364,6 +558,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         isRunning = true;
         clock.start();
         animationFrameId = requestAnimationFrame(animate);
+        scheduleNextBlink();
     };
 
     const updateMotionState = (reduced) => {
@@ -399,7 +594,7 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         canvas.style.display = 'none';
     }
 
-    // --- 9. RENDER LOOP ---
+    // --- 11. RENDER LOOP ---
     const clock = new THREE.Clock();
 
     const animate = () => {
@@ -412,27 +607,95 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
         const delta = clock.getDelta();
         const time = clock.getElapsedTime();
+        const now = performance.now();
 
         // Update Blender animation mixer
         if (mixer) {
             mixer.update(delta);
         }
 
-        // Smooth scale entrance
-        if (currentScale < targetScale) {
+        // Smooth two-way scale lerp (fixes one-way scale bug)
+        if (Math.abs(currentScale - targetScale) > 0.0005) {
             currentScale += (targetScale - currentScale) * 0.08;
             mascotGroup.scale.setScalar(currentScale);
         }
 
-        // Lerp rotation towards mouse
-        mascotGroup.rotation.y += (targetRotY - mascotGroup.rotation.y) * 0.055;
-        mascotGroup.rotation.x += (targetRotX + nodOffset - mascotGroup.rotation.x) * 0.055;
-        mascotGroup.rotation.z += (targetRotZ - mascotGroup.rotation.z) * 0.055;
+        // Emote 1: Dance (2.0s duration)
+        if (isDancing) {
+            const elapsed = (now - danceStartTime) / 1000;
+            if (elapsed >= 2.0) {
+                isDancing = false;
+                danceRotZ = 0;
+                danceBounceY = 0;
+            } else {
+                const envelope = Math.sin((elapsed / 2.0) * Math.PI);
+                danceRotZ = Math.sin(elapsed * 25.0) * 0.22 * envelope;
+                danceBounceY = Math.abs(Math.sin(elapsed * 16.0)) * 0.20 * envelope;
+            }
+        } else {
+            danceRotZ = 0;
+            danceBounceY = 0;
+        }
+
+        // Emote 2: Scroll Idle (20s)
+        if (!isDancing && !isPeeking && !isSpinning360 && (now - lastScrollTime > 20000)) {
+            if (!isIdleLooking) {
+                isIdleLooking = true;
+                nextIdleLookTime = now;
+            }
+            if (now >= nextIdleLookTime) {
+                idleTargetRotY = (Math.random() - 0.5) * 0.8;
+                idleTargetRotX = (Math.random() - 0.5) * 0.4;
+                nextIdleLookTime = now + 2500 + Math.random() * 1500;
+                if (Math.random() < 0.35) {
+                    headShakeActive = true;
+                    headShakeStartTime = now;
+                }
+            }
+            if (headShakeActive) {
+                const shakeElapsed = (now - headShakeStartTime) / 1000;
+                if (shakeElapsed >= 0.8) {
+                    headShakeActive = false;
+                    headShakeOffset = 0;
+                } else {
+                    const env = Math.sin((shakeElapsed / 0.8) * Math.PI);
+                    headShakeOffset = Math.sin(shakeElapsed * 28.0) * 0.16 * env;
+                }
+            }
+        } else {
+            isIdleLooking = false;
+            headShakeActive = false;
+            idleTargetRotY = 0;
+            idleTargetRotX = 0;
+            headShakeOffset = 0;
+        }
+
+        // Emote 3: 360 Spin on currentModelObject (prevents Euler angle flipping on mascotGroup)
+        if (isSpinning360 && currentModelObject) {
+            const spinElapsed = (now - spinStartTime) / 900; // 0.9s duration
+            if (spinElapsed >= 1.0) {
+                isSpinning360 = false;
+                currentModelObject.rotation.y = 0;
+            } else {
+                const t = spinElapsed;
+                const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                currentModelObject.rotation.y = ease * Math.PI * 2;
+            }
+        }
+
+        // Lerp rotation towards mouse / idle target with emote offsets
+        const activeTargetRotY = (isIdleLooking ? idleTargetRotY : targetRotY) + peekGazeY + headShakeOffset;
+        const activeTargetRotX = (isIdleLooking ? idleTargetRotX : targetRotX) + nodOffset + peekRotX + peekGazeX;
+        const activeTargetRotZ = targetRotZ + danceRotZ + peekRotZ;
+
+        mascotGroup.rotation.y += (activeTargetRotY - mascotGroup.rotation.y) * 0.055;
+        mascotGroup.rotation.x += (activeTargetRotX - mascotGroup.rotation.x) * 0.055;
+        mascotGroup.rotation.z += (activeTargetRotZ - mascotGroup.rotation.z) * 0.055;
 
         // If rigged head bone exists, apply fine gaze tracking
         if (headBone) {
-            headBone.rotation.y += (targetRotY * 0.6 - headBone.rotation.y) * 0.1;
-            headBone.rotation.x += (targetRotX * 0.6 - headBone.rotation.x) * 0.1;
+            headBone.rotation.y += (activeTargetRotY * 0.6 - headBone.rotation.y) * 0.1;
+            headBone.rotation.x += (activeTargetRotX * 0.6 - headBone.rotation.x) * 0.1;
         }
 
         // Spring nod physics
@@ -440,10 +703,10 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         nodVelocity *= 0.88;
         nodOffset += nodVelocity;
 
-        // Gentle breathing float
+        // Gentle breathing float + dance bounce (fixes position.y override bug)
         const isMobile = window.innerWidth < 768;
         const basePosY = isMobile ? 0.35 : 0.05;
-        mascotGroup.position.y = basePosY + Math.sin(time * 1.5) * 0.07;
+        mascotGroup.position.y = basePosY + Math.sin(time * 1.5) * 0.07 + danceBounceY;
 
         // Drift Ember Particles
         particles.rotation.y = time * 0.06;
