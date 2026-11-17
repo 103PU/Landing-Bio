@@ -156,16 +156,21 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
     mascotColorTex.colorSpace = THREE.SRGBColorSpace;
     const mascotNormalTex = texLoader.load('./assets/husky_normal.png');
 
-    // Preload blink texture with WebGL VRAM initialization
+    // Preload blink texture with WebGL VRAM initialization (single download)
     let mascotBlinkTex = null;
-    const blinkImg = new Image();
-    blinkImg.onload = () => {
-        mascotBlinkTex = texLoader.load('./assets/husky_cutout_blink.png', (tex) => {
+    texLoader.load(
+        './assets/husky_cutout_blink.png',
+        (tex) => {
             tex.colorSpace = THREE.SRGBColorSpace;
+            mascotBlinkTex = tex;
             if (renderer) renderer.initTexture(tex);
-        });
-    };
-    blinkImg.src = './assets/husky_cutout_blink.png';
+        },
+        undefined,
+        (err) => {
+            console.warn('[3D Mascot] Blink texture load failed or not found:', err);
+            mascotBlinkTex = null;
+        }
+    );
 
     let mixer = null;
     let headBone = null;
@@ -291,21 +296,37 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
         setupMascotGeometry(fallbackMesh);
     };
 
-    // Attempt loading husky.glb first, fallback to depth mesh
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.load(
+    // Candidates in priority order (Blender model can be husky.glb, model.glb, or mascot.glb)
+    const MODEL_CANDIDATES = [
         './assets/husky.glb',
-        (gltf) => {
-            setupMascotGeometry(gltf.scene, gltf.animations);
-            canvas.style.opacity = '1';
-        },
-        undefined,
-        (err) => {
-            console.warn('[3D Mascot] GLB load failed, falling back to procedural depth mesh:', err);
+        './assets/model.glb',
+        './assets/mascot.glb'
+    ];
+
+    const gltfLoader = new GLTFLoader();
+
+    const loadNextCandidate = (index) => {
+        if (index >= MODEL_CANDIDATES.length) {
             setupFallbackDepthMesh();
             canvas.style.opacity = '1';
+            return;
         }
-    );
+
+        const candidateUrl = MODEL_CANDIDATES[index];
+        gltfLoader.load(
+            candidateUrl,
+            (gltf) => {
+                setupMascotGeometry(gltf.scene, gltf.animations);
+                canvas.style.opacity = '1';
+            },
+            undefined,
+            () => {
+                loadNextCandidate(index + 1);
+            }
+        );
+    };
+
+    loadNextCandidate(0);
 
     // --- 7. TEXTURE-SWAP EYE BLINK CONTROLLER ---
     let blinkTimer = null;
