@@ -8,6 +8,10 @@ IMG_*.jpg
 .audit-shots/
 preview_*.png
 
+# Python
+__pycache__/
+*.pyc
+
 # OS / editor
 Thumbs.db
 Desktop.ini
